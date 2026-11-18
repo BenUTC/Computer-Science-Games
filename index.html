@@ -1,0 +1,1709 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS Open Evening Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#13202E; --navy:#1F3A5F; --paper:#F1F3F6; --line:#C9D1DB; --muted:#4A5868;
+  --amber:#F2A93B; --amber-soft:#FCE7B2; --green:#1F7A4D; --green-soft:#D7EFE2; --red:#B3361F; --red-soft:#F6DAD3; --orange:#C9661A;
+  --head:'Space Grotesk','Segoe UI',system-ui,sans-serif; --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif; --mono:'IBM Plex Mono',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-user-select:none;user-select:none}
+button{font-family:var(--head);font-weight:700;cursor:pointer;border:none;border-radius:12px;min-height:52px;padding:0 22px;font-size:20px;background:var(--navy);color:#fff;touch-action:manipulation}
+button:active{transform:translateY(1px)}
+button.ghost{background:#fff;color:var(--ink);border:2.5px solid var(--ink)}
+button.small{min-height:44px;font-size:16px;padding:0 16px}
+button.amber{background:var(--amber);color:var(--ink)}
+button.green{background:var(--green)}
+button[disabled]{opacity:.35;cursor:default}
+.screen{display:none;height:100vh;flex-direction:column}
+.screen.active{display:flex}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--ink);color:#fff;flex-wrap:wrap}
+.topbar h1{margin:0;font-family:var(--head);font-size:28px;flex:1;min-width:180px}
+.topbar .tag{font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:#B9CBE0}
+.seg{display:flex;border:2px solid #fff;border-radius:12px;overflow:hidden}
+.seg button{border-radius:0;background:transparent;min-height:44px;font-size:16px}
+.seg button.on{background:#fff;color:var(--ink)}
+.panel{background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:16px 18px}
+.panel h3{margin:0 0 10px;font-family:var(--head);font-size:20px}
+.mono{font-family:var(--mono)}
+.tag2{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--navy)}
+.lb{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.lb li{display:flex;justify-content:space-between;align-items:center;font-size:18px;padding:6px 10px;border-radius:8px;background:var(--paper)}
+.lb li .r{font-family:var(--mono);font-weight:600}
+.lb li.empty{background:none;color:var(--muted);font-size:15px}
+.lbfoot{display:flex;justify-content:flex-end;margin-top:8px;gap:8px}
+.lbfoot button{min-height:32px;font-size:12px;padding:0 10px;background:none;color:var(--muted);border:1px solid var(--line)}
+.overlay{position:fixed;inset:0;background:rgba(19,32,46,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.overlay.hidden{display:none}
+.modal{background:#fff;border-radius:22px;border:3px solid var(--ink);padding:30px 34px;max-width:680px;width:100%;display:flex;flex-direction:column;gap:16px;text-align:center;max-height:94vh;overflow:auto}
+.modal h2{margin:0;font-family:var(--head);font-size:38px}
+.modal p{margin:0;font-size:20px;line-height:1.45}
+.modal .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.initials{display:flex;gap:18px;justify-content:center}
+.initials .col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.initials .col button{width:76px;min-height:56px;font-size:22px;padding:0}
+.initials .letter{font-family:var(--mono);font-weight:600;font-size:54px;width:76px;height:76px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:12px}
+.main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;padding:18px;min-height:0}
+.left{display:flex;flex-direction:column;gap:14px;min-height:0}
+.side{display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.how{font-size:16px;line-height:1.5}
+
+/* MENU */
+#menu{background:var(--ink);color:#fff;align-items:center;justify-content:center;gap:26px;padding:28px;overflow:auto;height:auto;min-height:100vh}
+#menu .kicker{font-family:var(--mono);letter-spacing:.14em;color:#B9CBE0;font-size:16px;text-align:center}
+#menu h1{margin:0;font-family:var(--head);font-size:clamp(38px,5vw,66px);text-align:center;line-height:1}
+.lvlpick{display:flex;align-items:center;gap:14px;font-family:var(--head);font-size:20px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,350px));gap:20px;justify-content:center;width:100%}
+.card{background:#fff;color:var(--ink);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;border:none;text-align:left;min-height:0;font-weight:400}
+.card h2{margin:0;font-family:var(--head);font-size:28px}
+.card p{margin:0;font-size:15.5px;line-height:1.4;color:var(--muted);font-family:var(--body)}
+.card .spec{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--navy)}
+.card .go{align-self:flex-start;background:var(--amber);color:var(--ink);border-radius:10px;padding:9px 20px;font-family:var(--head);font-weight:700;font-size:18px;margin-top:auto}
+.card .new{display:inline-block;background:var(--green);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:middle}
+.card svg{width:100%;height:92px;background:var(--paper);border-radius:12px}
+#fsBtn{position:absolute;top:14px;right:14px;z-index:40;min-height:40px;font-size:14px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.4)}
+@media (max-width:1150px){.cards{grid-template-columns:repeat(2,minmax(0,350px))}}
+@media (max-width:760px){.cards{grid-template-columns:minmax(0,1fr)}}
+
+/* BINARY BLITZ */
+.blitzTop{display:flex;align-items:center;gap:20px}
+.blitzTop .stat{display:flex;flex-direction:column;align-items:center;min-width:90px}
+.blitzTop .stat b{font-family:var(--head);font-size:44px;line-height:1}
+.timebar{flex:1;height:22px;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--paper)}
+.timebar div{height:100%;background:var(--amber);width:100%;transition:width .1s linear}
+.targetPanel{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px;transition:background .2s}
+.targetPanel.good{background:var(--green-soft)}
+.tsub{font-family:var(--head);font-size:22px;font-weight:700;color:var(--muted)}
+.target{display:flex;align-items:baseline;gap:14px}
+.target #blitzTarget{font-family:var(--mono);font-weight:600;font-size:clamp(64px,9vw,120px);line-height:1}
+.hextag{font-family:var(--mono);font-weight:600;font-size:26px;background:var(--navy);color:#fff;border-radius:8px;padding:2px 10px}
+.bitrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+.bit{min-height:0;height:clamp(110px,15vh,150px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:0}
+.bit .pv{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--muted)}
+.bit .bv{font-family:var(--mono);font-size:54px;font-weight:600;line-height:1}
+.bit.on{background:var(--amber)}
+.bit.on .pv{color:var(--ink)}
+.targetPanel.bad{background:var(--red-soft)}
+.choices{display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.choice{height:clamp(100px,14vh,140px);font-family:var(--mono);font-size:52px;font-weight:600;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px}
+.choice.right{background:var(--green-soft);border-color:var(--green)}
+.live{text-align:center;font-family:var(--head);font-size:24px;font-weight:700;min-height:32px}
+
+/* SORT */
+.scalewrap{background:#fff;border:2.5px solid var(--ink);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:10px 10px 14px;gap:8px}
+#scale{width:100%;max-width:640px;height:auto}
+#sortMsg{font-family:var(--head);font-size:24px;font-weight:700;text-align:center;min-height:32px}
+.modes{display:flex;gap:10px;justify-content:center}
+.modes button{background:#fff;color:var(--ink);border:2.5px solid var(--ink)}
+.modes button.on{background:var(--ink);color:#fff}
+.boxes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.box{width:clamp(76px,9vw,112px);aspect-ratio:1/1.05;border-radius:14px;background:#C99A5B;border:3px solid #6B4A22;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#2A1A10;position:relative;cursor:pointer;touch-action:manipulation;font-family:var(--head);box-shadow:inset 0 0 0 5px rgba(255,255,255,.18)}
+.box .L{font-size:clamp(34px,4vw,50px);font-weight:700;line-height:1}
+.box .W{font-family:var(--mono);font-size:16px;font-weight:600;min-height:20px}
+.box.sel{outline:5px solid var(--amber);outline-offset:3px;transform:translateY(-6px)}
+.box.ok{background:var(--green-soft);border-color:var(--green)}
+.box.bad{background:var(--red-soft);border-color:var(--red)}
+.posrow{display:flex;gap:12px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.posrow span{width:clamp(76px,9vw,112px);text-align:center}
+.log{display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow:auto}
+.log span{font-family:var(--mono);font-weight:600;background:var(--paper);border-radius:6px;padding:3px 8px;font-size:15px}
+.big{font-family:var(--head);font-size:64px;font-weight:700;line-height:1}
+.race{display:none;flex-direction:column;gap:14px;flex:1;min-height:0}
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.lane{background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.lane .hd{display:flex;justify-content:space-between;align-items:baseline}
+.lane .hd b{font-family:var(--head);font-size:24px}
+.lane .hd span{font-family:var(--mono);font-size:22px;font-weight:600}
+.lane .sub{font-size:14px;color:var(--muted);min-height:20px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:220px;border-bottom:3px solid var(--ink);padding:0 4px}
+.bar{flex:1;background:#C99A5B;border:2px solid #6B4A22;border-bottom:none;border-radius:6px 6px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-family:var(--mono);font-size:13px;font-weight:600;padding-top:3px;transition:height .25s}
+.bar.hl{background:var(--amber);border-color:var(--ink)}
+.bar.rng{background:#E4C79E}
+.barlabels{display:flex;gap:6px;padding:0 4px}
+.barlabels span{flex:1;text-align:center;font-family:var(--head);font-weight:700;font-size:18px}
+.result{display:none}
+.result table{width:100%;border-collapse:collapse;font-size:20px}
+.result td{padding:8px 10px;border-top:1px solid var(--line)}
+.result td:last-child{text-align:right;font-family:var(--mono);font-weight:600}
+.result tr.you td{background:var(--amber-soft)}
+.result p{font-size:17px;line-height:1.45;margin:10px 0 0}
+
+/* GATES */
+.boardwrap{flex:1;min-height:0;background:#fff;border:2.5px solid var(--ink);border-radius:16px;overflow:hidden;display:flex}
+#board{width:100%;height:100%;touch-action:none;display:block}
+.palette{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.palette .lbl{font-family:var(--head);font-weight:700;font-size:18px;margin-right:4px}
+.palette button{background:#fff;color:var(--ink);border:2.5px solid var(--ink);min-width:96px}
+#gateMsg{font-size:18px;color:var(--muted);flex:1;text-align:right;min-width:220px}
+.lvl{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.08em;color:var(--navy)}
+.lvname{font-family:var(--head);font-size:28px;font-weight:700;margin:2px 0 0}
+.scene{font-size:19px;line-height:1.45;margin-top:8px}
+.namemap{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.namemap span{background:var(--paper);border-radius:6px;padding:3px 8px;font-size:15px}
+.namemap b{font-family:var(--mono)}
+.tt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:20px;text-align:center}
+.tt th{background:var(--ink);color:#fff;font-size:15px;padding:6px 0}
+.tt td{padding:5px 0;border-top:1px solid var(--line);cursor:pointer}
+.tt tr.cur td{background:var(--amber-soft)}
+.tt td.m{color:var(--green);font-weight:600}
+.tt td.x{color:var(--red);font-weight:600}
+.stats{display:flex;justify-content:space-between;font-size:17px}
+.stats b{font-family:var(--mono);font-size:22px}
+.ov{text-decoration:overline}
+.expr{font-family:var(--mono);font-size:32px;font-weight:600}
+.guide{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;text-align:left}
+.gg{border:2px solid var(--ink);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.gg b{font-family:var(--head);font-size:22px}
+.gg span{font-size:15px;line-height:1.35}
+.gg .tt{font-size:15px}
+.gg .tt th{font-size:12px;padding:3px 0}
+.gg .tt td{padding:2px 0;cursor:default}
+
+/* BEAT THE MACHINE */
+.mleft{align-items:center}
+.ttt{display:grid;grid-template-columns:repeat(3,min(15vh,140px));grid-template-rows:repeat(3,min(15vh,140px));gap:10px;background:var(--ink);padding:10px;border-radius:18px}
+.cell{background:#fff;border-radius:10px;font-family:var(--head);font-size:min(10vh,96px);font-weight:700;color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0;padding:0;line-height:1}
+.cell.o{color:var(--orange)}
+.cell.win{background:var(--amber-soft)}
+.cell.last{box-shadow:inset 0 0 0 5px var(--amber)}
+.cell .bd{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--ink)}
+.cell .bl{font-family:var(--body);font-size:13px;color:var(--ink);font-weight:600}
+#menaceMsg{font-family:var(--head);font-size:24px;font-weight:700;text-align:center;min-height:32px;max-width:760px}
+#menaceSub{font-size:17px;text-align:center;color:var(--muted);max-width:720px;min-height:24px;line-height:1.4}
+.mstats{width:100%;max-width:760px;display:flex;flex-direction:column;gap:10px}
+.mcounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;text-align:center}
+.mcounts div{display:flex;flex-direction:column}
+.mcounts b{font-family:var(--head);font-size:34px;line-height:1.1}
+.mcounts span{font-size:13px;color:var(--muted)}
+.strip{display:flex;flex-wrap:wrap;gap:4px}
+.strip i{width:16px;height:16px;border-radius:3px;display:inline-block}
+.key3{display:flex;gap:14px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.key3 i{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+/* PHISH */
+.ctxPanel{display:flex;flex-direction:column;gap:4px;padding:12px 18px}
+#phishCtx{font-size:19px;line-height:1.4}
+.phishCard{flex:none;min-height:0;display:flex;align-items:flex-start;justify-content:center;overflow:auto}
+.mail{background:#fff;border:2.5px solid var(--ink);border-radius:14px;width:100%;max-width:820px;overflow:hidden}
+.mhead{display:flex;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.av{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:20px;flex:none}
+.mfrom{font-size:18px}
+.mfrom .addr{font-family:var(--mono);font-size:16px;color:var(--muted)}
+.mto{font-size:14px;color:var(--muted)}
+.msubj{font-family:var(--head);font-weight:700;font-size:24px;padding:14px 18px 0}
+.mbody{padding:6px 18px 14px;font-size:19px;line-height:1.5}
+.mbody p{margin:8px 0}
+.btnlink{display:inline-block;background:var(--navy);color:#fff;border-radius:8px;padding:8px 16px;font-weight:600;font-size:17px;margin:4px 18px 12px}
+.status{background:var(--paper);border-top:1px solid var(--line);padding:8px 18px;font-size:15px;color:var(--muted)}
+.status .mono{color:var(--ink);font-weight:600}
+.attach{display:flex;align-items:center;gap:10px;margin:0 18px 14px;border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:16px;font-weight:600;width:max-content;max-width:calc(100% - 36px)}
+.phone{background:#fff;border:2.5px solid var(--ink);border-radius:28px;width:100%;max-width:460px;padding:16px 18px 24px;display:flex;flex-direction:column;gap:12px}
+.pfrom{text-align:center;font-family:var(--head);font-weight:700;font-size:20px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.bubble{background:var(--paper);border-radius:18px 18px 18px 4px;padding:12px 16px;font-size:19px;line-height:1.45;align-self:flex-start;max-width:92%;word-break:break-word}
+.browser{background:#fff;border:2.5px solid var(--ink);border-radius:14px;width:100%;max-width:820px;overflow:hidden}
+.bbar{display:flex;align-items:center;gap:10px;background:var(--paper);padding:10px 14px;border-bottom:1.5px solid var(--line)}
+.bdots{display:flex;gap:6px}
+.bdots i{width:11px;height:11px;border-radius:50%;background:var(--line);display:inline-block}
+.urlbox{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:16px;font-weight:600;overflow:hidden;white-space:nowrap}
+.nsec{font-family:var(--body);font-size:13px;color:var(--red);font-weight:600}
+.page{padding:22px 28px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.brand{font-family:var(--head);font-weight:700;font-size:22px;color:var(--navy)}
+.page h3{margin:0;font-family:var(--head);font-size:26px}
+.field{width:100%;max-width:380px;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--muted);font-size:16px}
+.fbtn{background:var(--navy);color:#fff;border-radius:8px;padding:9px 22px;font-weight:600}
+.page p{margin:0;font-size:16px;color:var(--muted)}
+.bigbtn{min-height:76px;font-size:30px;min-width:220px}
+.bigbtn.safe{background:var(--green)}
+.bigbtn.scam{background:var(--red)}
+.verdict{display:none;flex-direction:column;gap:8px}
+.vhead{font-family:var(--head);font-size:28px;font-weight:700}
+.vhead.ok{color:var(--green)}
+.vhead.no{color:var(--red)}
+.verdict p{margin:0;font-size:18px;line-height:1.45}
+.stats2{display:flex;justify-content:space-around;text-align:center}
+.stats2 b{display:block;font-family:var(--head);font-size:38px;line-height:1.1}
+.mseg{display:inline-flex;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden}
+.mseg button{border-radius:0;background:#fff;color:var(--ink);min-height:46px;font-size:17px}
+.mseg button.on{background:var(--ink);color:#fff}
+.lvlrow{display:flex;align-items:center;justify-content:center;gap:12px;font-family:var(--head);font-weight:700;font-size:18px}
+.tips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:16px;line-height:1.4}
+@media (max-width:1100px){.main{grid-template-columns:1fr}.side{overflow:visible}.screen{height:auto;min-height:100vh}.boardwrap{min-height:440px}}
+</style>
+</head>
+<body>
+
+<!-- MENU -->
+<section id="menu" class="screen active">
+  <button id="fsBtn" class="small" type="button">Full screen</button>
+  <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+    <div class="kicker">UTC SOUTH DURHAM · COMPUTER SCIENCE</div>
+    <h1>Open Evening Challenges</h1>
+  </div>
+  <div class="lvlpick"><span>Who's playing?</span><div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div></div>
+  <div class="cards">
+    <button class="card" type="button" data-go="blitz">
+      <svg viewBox="0 0 400 92" aria-hidden="true">
+        <g font-family="IBM Plex Mono, Consolas, monospace" font-weight="600" font-size="26" text-anchor="middle">
+          <rect x="22" y="22" width="40" height="48" rx="6" fill="#fff" stroke="#13202E" stroke-width="3"/><text x="42" y="55" fill="#13202E">0</text>
+          <rect x="68" y="22" width="40" height="48" rx="6" fill="#F2A93B" stroke="#13202E" stroke-width="3"/><text x="88" y="55" fill="#13202E">1</text>
+          <rect x="114" y="22" width="40" height="48" rx="6" fill="#fff" stroke="#13202E" stroke-width="3"/><text x="134" y="55" fill="#13202E">0</text>
+          <rect x="160" y="22" width="40" height="48" rx="6" fill="#F2A93B" stroke="#13202E" stroke-width="3"/><text x="180" y="55" fill="#13202E">1</text>
+          <rect x="206" y="22" width="40" height="48" rx="6" fill="#F2A93B" stroke="#13202E" stroke-width="3"/><text x="226" y="55" fill="#13202E">1</text>
+          <rect x="252" y="22" width="40" height="48" rx="6" fill="#fff" stroke="#13202E" stroke-width="3"/><text x="272" y="55" fill="#13202E">0</text>
+          <text x="340" y="58" font-size="34" fill="#1F3A5F">= ?</text>
+        </g>
+      </svg>
+      <span class="spec">DATA REPRESENTATION · BINARY</span>
+      <h2>Binary Blitz<span class="new">NEW</span></h2>
+      <p>Convert between binary and denary against the clock. How many can you get in 60 seconds?</p>
+      <span class="go">Play</span>
+    </button>
+    <button class="card" type="button" data-go="menace">
+      <svg viewBox="0 0 400 92" aria-hidden="true">
+        <g stroke="#13202E" stroke-width="4" stroke-linecap="round"><line x1="168" y1="8" x2="168" y2="84"/><line x1="206" y1="8" x2="206" y2="84"/><line x1="134" y1="34" x2="240" y2="34"/><line x1="134" y1="60" x2="240" y2="60"/></g>
+        <g stroke="#1F3A5F" stroke-width="5" stroke-linecap="round"><line x1="142" y1="14" x2="160" y2="28"/><line x1="160" y1="14" x2="142" y2="28"/><line x1="214" y1="40" x2="232" y2="54"/><line x1="232" y1="40" x2="214" y2="54"/></g>
+        <circle cx="187" cy="47" r="9" fill="none" stroke="#C9661A" stroke-width="5"/>
+        <rect x="270" y="30" width="80" height="44" rx="5" fill="#C99A5B" stroke="#6B4A22" stroke-width="3"/>
+        <circle cx="290" cy="52" r="6" fill="#B3361F"/><circle cx="310" cy="52" r="6" fill="#1F3A5F"/><circle cx="330" cy="52" r="6" fill="#F2A93B"/>
+      </svg>
+      <span class="spec">ALGORITHMS · MACHINE LEARNING</span>
+      <h2>Beat the Machine<span class="new">NEW</span></h2>
+      <p>Play noughts and crosses against a computer that learns from every game it loses. Can you still beat it later tonight?</p>
+      <span class="go">Play</span>
+    </button>
+    <button class="card" type="button" data-go="phish">
+      <svg viewBox="0 0 400 92" aria-hidden="true">
+        <rect x="120" y="16" width="120" height="70" rx="8" fill="#fff" stroke="#13202E" stroke-width="4"/>
+        <path d="M120 22 L180 58 L240 22" fill="none" stroke="#13202E" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M262 76 L292 22 L322 76 Z" fill="#B3361F" stroke="#13202E" stroke-width="3" stroke-linejoin="round"/>
+        <rect x="289" y="40" width="6" height="20" rx="2" fill="#fff"/><circle cx="292" cy="67" r="3.5" fill="#fff"/>
+      </svg>
+      <span class="spec">CYBER SECURITY · SOCIAL ENGINEERING</span>
+      <h2>Phish or Legit?<span class="new">NEW</span></h2>
+      <p>Emails, texts and websites flash up. Is each one safe or a scam? Spot the clues and answer fast.</p>
+      <span class="go">Play</span>
+    </button>
+    <button class="card" type="button" data-go="gates">
+      <svg viewBox="0 0 400 92" aria-hidden="true">
+        <path d="M60 32 H150 M60 64 H150 M220 48 H300" stroke="#F2A93B" stroke-width="6" fill="none"/>
+        <path d="M150 16 H185 A32 32 0 0 1 185 80 H150 Z" fill="#fff" stroke="#13202E" stroke-width="5"/>
+        <rect x="300" y="10" width="64" height="76" rx="6" fill="#1F7A4D" stroke="#13202E" stroke-width="4"/>
+        <circle cx="352" cy="50" r="5" fill="#fff"/>
+        <rect x="20" y="18" width="40" height="28" rx="6" fill="#F2A93B" stroke="#13202E" stroke-width="3"/>
+        <rect x="20" y="50" width="40" height="28" rx="6" fill="#F2A93B" stroke="#13202E" stroke-width="3"/>
+      </svg>
+      <span class="spec">COMPUTER SYSTEMS · LOGIC GATES</span>
+      <h2>Gate Escape</h2>
+      <p>Each locked door has a rule. Wire up logic gates to follow it and the door opens. How many doors can you escape?</p>
+      <span class="go">Play</span>
+    </button>
+    <button class="card" type="button" data-go="sort">
+      <svg viewBox="0 0 400 92" aria-hidden="true">
+        <line x1="200" y1="22" x2="200" y2="80" stroke="#13202E" stroke-width="6"/>
+        <polygon points="180,88 220,88 200,70" fill="#13202E"/>
+        <line x1="110" y1="38" x2="290" y2="16" stroke="#13202E" stroke-width="6" stroke-linecap="round"/>
+        <rect x="88" y="38" width="44" height="40" rx="6" fill="#C99A5B" stroke="#6B4A22" stroke-width="3"/>
+        <rect x="268" y="16" width="44" height="40" rx="6" fill="#C99A5B" stroke="#6B4A22" stroke-width="3"/>
+        <text x="110" y="66" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="22" fill="#2A1A10">C</text>
+        <text x="290" y="44" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="22" fill="#2A1A10">F</text>
+      </svg>
+      <span class="spec">ALGORITHMS · SORTING</span>
+      <h2>Sorting Showdown</h2>
+      <p>Sort the mystery boxes from lightest to heaviest in as few weighings as you can, then race real algorithms.</p>
+      <span class="go">Play</span>
+    </button>
+  </div>
+</section>
+
+<!-- BINARY BLITZ -->
+<section id="blitz" class="screen">
+  <div class="topbar">
+    <button class="small ghost" type="button" data-go="menu">Menu</button>
+    <h1>Binary Blitz</h1>
+    <div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div>
+    <button class="small amber" type="button" id="blitzNew">New game</button>
+  </div>
+  <div class="main">
+    <div class="left">
+      <div class="panel blitzTop">
+        <div class="stat"><span class="tag2">TIME</span><b id="blitzTime">60</b></div>
+        <div class="timebar"><div id="blitzBar"></div></div>
+        <div class="stat"><span class="tag2">SCORE</span><b id="blitzScore">0</b></div>
+      </div>
+      <div class="panel targetPanel" id="blitzTargetPanel">
+        <div class="tsub" id="blitzSub">Make this number in binary</div>
+        <div class="target"><span class="hextag" id="blitzHexTag" style="display:none">HEX</span><span id="blitzTarget">?</span></div>
+      </div>
+      <div class="bitrow" id="blitzBits"></div>
+      <div class="choices" id="blitzChoices"></div>
+      <div class="live" id="blitzLive"></div>
+      <div class="actions"><button type="button" class="ghost" id="blitzClear">Clear</button><button type="button" class="ghost" id="blitzSkip">Skip</button></div>
+    </div>
+    <div class="side">
+      <div class="panel"><h3>How to play</h3><div class="how" id="blitzHow"></div></div>
+      <div class="panel"><h3 id="blitzLbTitle">Top scores</h3><ol class="lb" id="blitzLb"></ol><div class="lbfoot"><button type="button" id="blitzLbReset">Teacher: reset</button></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BEAT THE MACHINE -->
+<section id="menace" class="screen">
+  <div class="topbar">
+    <button class="small ghost" type="button" data-go="menu">Menu</button>
+    <h1>Beat the Machine</h1>
+    <div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div>
+    <button class="small ghost" type="button" id="thinkBtn">Show its thinking: off</button>
+    <button class="small amber" type="button" id="menaceNew">New game</button>
+  </div>
+  <div class="main">
+    <div class="left mleft">
+      <div id="menaceMsg">The machine is X and goes first. You are O.</div>
+      <div class="ttt" id="ttt"></div>
+      <div id="menaceSub"></div>
+      <div class="panel mstats">
+        <div class="mcounts">
+          <div><b id="mGames">0</b><span>games tonight</span></div>
+          <div><b id="mMachine">0</b><span>machine wins</span></div>
+          <div><b id="mDraws">0</b><span>draws</span></div>
+          <div><b id="mHumans">0</b><span>visitor wins</span></div>
+        </div>
+        <div class="strip" id="mStrip"></div>
+        <div class="key3"><span><i style="background:#1F3A5F"></i>machine won</span><span><i style="background:#A9B3BF"></i>draw</span><span><i style="background:#F2A93B"></i>visitor won</span><span>Latest game on the right</span></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="panel"><h3>How it learns</h3><div class="how" id="menaceHow"></div></div>
+      <div class="panel"><h3>Hall of fame: they beat it</h3><ol class="lb" id="hof"></ol></div>
+      <div class="panel">
+        <h3>Teacher controls</h3>
+        <div class="how" id="brainInfo" style="font-size:14px;color:var(--muted);margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="small ghost" id="trainBtn">Train: 200 practice games</button>
+          <button type="button" class="small ghost" id="brainReset">Reset its brain</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHISH OR LEGIT -->
+<section id="phish" class="screen">
+  <div class="topbar">
+    <button class="small ghost" type="button" data-go="menu">Menu</button>
+    <h1>Phish or Legit?</h1>
+    <div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div>
+    <button class="small amber" type="button" id="phishNew">New game</button>
+  </div>
+  <div class="main">
+    <div class="left">
+      <div class="panel ctxPanel"><span class="tag2">THE SITUATION</span><div id="phishCtx"></div></div>
+      <div class="phishCard" id="phishCard"></div>
+      <div class="actions" id="phishBtns"><button type="button" class="bigbtn safe" id="btnSafe">Safe</button><button type="button" class="bigbtn scam" id="btnScam">Scam</button></div>
+      <div class="panel verdict" id="phishVerdict"></div>
+    </div>
+    <div class="side">
+      <div class="panel stats2"><div><span class="tag2">MESSAGE</span><b id="phishQ">0/10</b></div><div><span class="tag2">POINTS</span><b id="phishScore">0</b></div></div>
+      <div class="panel"><h3>Spot the scam</h3><ul class="tips" id="phishTips"></ul></div>
+      <div class="panel"><h3 id="phishLbTitle">Top spotters</h3><ol class="lb" id="phishLb"></ol><div class="lbfoot"><button type="button" id="phishLbReset">Teacher: reset</button></div></div>
+      <div style="font-size:13px;color:var(--muted)">Every company, person, address and phone number in this game is made up.</div>
+    </div>
+  </div>
+</section>
+
+<!-- GATE ESCAPE -->
+<section id="gates" class="screen">
+  <div class="topbar">
+    <button class="small ghost" type="button" data-go="menu">Menu</button>
+    <h1>Gate Escape</h1>
+    <div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div>
+    <span class="tag">TIME</span><span class="mono" id="runTime" style="font-size:24px;font-weight:600">0:00</span>
+    <button class="small ghost" type="button" id="guideBtn">Gate guide</button>
+    <button class="small ghost" type="button" id="hintBtn">Hint</button>
+    <button class="small ghost" type="button" id="skipBtn">Skip door</button>
+    <button class="small amber" type="button" id="endRun">End run</button>
+  </div>
+  <div class="main">
+    <div class="left">
+      <div class="boardwrap"><svg id="board" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" aria-label="Circuit board"></svg></div>
+      <div class="palette">
+        <span class="lbl">Add a gate:</span>
+        <button type="button" data-add="AND">AND</button>
+        <button type="button" data-add="OR">OR</button>
+        <button type="button" data-add="NOT">NOT</button>
+        <button type="button" data-add="XOR">XOR</button>
+        <button type="button" class="small ghost" id="clearBoard">Clear</button>
+        <span id="gateMsg"></span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <div class="lvl" id="lvNum">DOOR 1 OF 8</div>
+        <div class="lvname" id="lvName"></div>
+        <div class="scene" id="lvScene"></div>
+        <div class="namemap" id="lvMap"></div>
+        <div id="lvHint" style="font-size:16px;color:var(--navy);font-weight:600;margin-top:10px;min-height:22px"></div>
+      </div>
+      <div class="panel">
+        <h3>Check your circuit</h3>
+        <table class="tt" id="tt"></table>
+        <div style="font-size:14px;color:var(--muted);margin-top:8px">Tap a row to set the switches. Q is the door: 1 = open.</div>
+      </div>
+      <div class="panel stats"><span>Doors opened</span><b id="cleared">0</b></div>
+      <div class="panel">
+        <h3 id="gateLbTitle">Escape leaderboard</h3>
+        <ol class="lb" id="gateLb"></ol>
+        <div class="lbfoot"><button type="button" id="gateLbReset">Teacher: reset</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SORTING SHOWDOWN -->
+<section id="sort" class="screen">
+  <div class="topbar">
+    <button class="small ghost" type="button" data-go="menu">Menu</button>
+    <h1>Sorting Showdown</h1>
+    <div class="seg levelSeg"><button type="button" data-level="y10">Year 10</button><button type="button" data-level="y12">Sixth form</button></div>
+    <span class="tag">BOXES</span>
+    <div class="seg" id="nSeg"><button type="button" data-n="6">6</button><button type="button" data-n="8" class="on">8</button></div>
+    <button class="small amber" type="button" id="sortNew">New game</button>
+  </div>
+  <div class="main">
+    <div class="left">
+      <div id="playArea" style="display:flex;flex-direction:column;gap:14px">
+        <div class="scalewrap">
+          <svg id="scale" viewBox="0 0 640 230" aria-label="Balance scale"></svg>
+          <div id="sortMsg">Tap two boxes to weigh them.</div>
+          <div class="actions" id="sortActions" style="min-height:52px"></div>
+        </div>
+        <div class="modes">
+          <button type="button" id="modeWeigh" class="on">Weigh two boxes</button>
+          <button type="button" id="modeSwap">Swap two boxes</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="boxes" id="boxes"></div>
+          <div class="posrow" id="posrow"></div>
+        </div>
+        <div style="display:flex;justify-content:center"><button type="button" class="green" id="sortCheck">I'm done: check my order</button></div>
+      </div>
+      <div class="race" id="race">
+        <div class="lanes">
+          <div class="lane"><div class="hd"><b>Bubble sort</b><span id="bubCount">0</span></div><div class="sub">Compares neighbours and swaps them. Repeats until nothing moves.</div><div class="bars" id="bubBars"></div><div class="barlabels" id="bubLabels"></div></div>
+          <div class="lane"><div class="hd"><b>Merge sort</b><span id="merCount">0</span></div><div class="sub">Splits the boxes into halves, sorts each half, then merges them.</div><div class="bars" id="merBars"></div><div class="barlabels" id="merLabels"></div></div>
+        </div>
+        <div class="actions">
+          <button type="button" class="small ghost" id="raceFast">Speed up</button>
+          <button type="button" class="small ghost" id="raceSkip">Skip to the end</button>
+        </div>
+        <div class="panel result" id="result"></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="panel" style="display:flex;justify-content:space-between;align-items:center">
+        <div><h3 style="margin:0">Weighings</h3><div style="font-size:15px;color:var(--muted)">fewer is better</div></div>
+        <div class="big" id="compCount">0</div>
+      </div>
+      <div class="panel">
+        <h3>What you've found out</h3>
+        <div class="log" id="log"></div>
+      </div>
+      <div class="panel">
+        <h3>How to play</h3>
+        <div class="how">Every box has a hidden weight. Tap two boxes to put them on the scales. Use <b>Swap</b> to move boxes. Get them in order, lightest on the left, then press <b>check</b>.</div>
+      </div>
+      <div class="panel">
+        <h3 id="sortLbTitle">Top sorters</h3>
+        <ol class="lb" id="sortLb"></ol>
+        <div class="lbfoot"><button type="button" id="sortLbReset">Teacher: reset</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="overlay" class="overlay hidden"><div class="modal" id="modal"></div></div>
+
+<script>
+(function(){
+'use strict';
+var $ = function(s){ return document.querySelector(s); };
+var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+/* ---------- storage (safe) ---------- */
+var memStore = {};
+function loadVal(key, def){
+  try { var v = localStorage.getItem(key); if (v !== null) return JSON.parse(v); } catch(e){}
+  return memStore.hasOwnProperty(key) ? memStore[key] : def;
+}
+function save(key, val){ memStore[key] = val; try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+function load(key){ var v = loadVal(key, []); return Array.isArray(v) ? v : []; }
+
+/* ---------- helpers ---------- */
+function shuffle(a){ for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function rand(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function levelPicker(){ return '<div class="lvlrow"><span>Who\u2019s playing?</span><div class="mseg">' + ['y10','y12'].map(function(l){ return '<button type="button" data-mlevel="' + l + '" class="' + (l === LEVEL ? 'on' : '') + '">' + LVNAME[l] + '</button>'; }).join('') + '</div></div>'; }
+function bindLevelPicker(){ $$('[data-mlevel]').forEach(function(b){ b.onclick = function(){ if (b.dataset.mlevel !== LEVEL) setLevel(b.dataset.mlevel); }; }); }
+function fmtTime(s){ s = Math.max(0, Math.round(s)); return Math.floor(s/60) + ':' + ('0' + (s%60)).slice(-2); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderLb(el, items, fmt, empty){
+  items = items.slice(0, 8);
+  el.innerHTML = items.length ? items.map(function(e, i){ return '<li><span>' + (i+1) + '. ' + esc(e.name) + '</span><span class="r">' + fmt(e) + '</span></li>'; }).join('')
+    : '<li class="empty">' + empty + '</li>';
+}
+function addScore(key, entry, cmp){ var lb = load(key); lb.push(entry); lb.sort(cmp); save(key, lb.slice(0, 50)); }
+
+/* ---------- level ---------- */
+var LEVEL = loadVal('oe-level', 'y10'); if (LEVEL !== 'y10' && LEVEL !== 'y12') LEVEL = 'y10';
+var LVNAME = { y10: 'Year 10', y12: 'Sixth form' };
+function syncLevelSegs(){ $$('.levelSeg button').forEach(function(b){ b.classList.toggle('on', b.dataset.level === LEVEL); }); }
+function activeId(){ var s = $('.screen.active'); return s ? s.id : ''; }
+
+/* ---------- screens ---------- */
+var GAMES = {};
+function show(id){
+  closeModal();
+  $$('.screen').forEach(function(s){ s.classList.toggle('active', s.id === id); });
+  Object.keys(GAMES).forEach(function(k){
+    if (k === id) GAMES[k].enter(); else if (GAMES[k].leave) GAMES[k].leave();
+  });
+  window.scrollTo(0, 0);
+}
+function setLevel(l){
+  LEVEL = l; save('oe-level', l); syncLevelSegs();
+  Object.keys(GAMES).forEach(function(k){ if (GAMES[k].onLevel) GAMES[k].onLevel(); });
+}
+$$('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.go); }); });
+$$('.levelSeg button').forEach(function(b){ b.addEventListener('click', function(){ if (b.dataset.level !== LEVEL) setLevel(b.dataset.level); }); });
+$('#fsBtn').addEventListener('click', function(){
+  try { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } catch(e){}
+});
+
+/* ---------- modal + initials ---------- */
+function modal(html){ $('#modal').innerHTML = html; $('#overlay').classList.remove('hidden'); }
+function closeModal(){ $('#overlay').classList.add('hidden'); }
+function askInitials(title, sub, cb){
+  var L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var idx = [0,0,0];
+  function draw(){
+    var cols = idx.map(function(v,i){
+      return '<div class="col"><button type="button" data-up="'+i+'">&#9650;</button><div class="letter">'+L[v]+'</div><button type="button" data-dn="'+i+'">&#9660;</button></div>';
+    }).join('');
+    modal('<h2>'+title+'</h2><p>'+sub+'</p><p style="font-size:17px;color:var(--muted)">Enter your initials for the leaderboard</p><div class="initials">'+cols+'</div><div class="row"><button type="button" class="green" id="iniSave">Save</button><button type="button" class="ghost" id="iniSkip">Skip</button></div>');
+    $$('[data-up]').forEach(function(b){ b.onclick = function(){ var i=+b.dataset.up; idx[i]=(idx[i]+1)%26; draw(); }; });
+    $$('[data-dn]').forEach(function(b){ b.onclick = function(){ var i=+b.dataset.dn; idx[i]=(idx[i]+25)%26; draw(); }; });
+    $('#iniSave').onclick = function(){ closeModal(); cb(idx.map(function(v){return L[v];}).join('')); };
+    $('#iniSkip').onclick = function(){ closeModal(); cb(null); };
+  }
+  draw();
+}
+
+/* =========================================================
+   BINARY BLITZ
+   ========================================================= */
+var Blitz = {
+  running: false, score: 0, bits: [0,0,0,0,0,0,0,0], target: null, timer: null, end: 0, dur: 60, locked: false,
+
+  enter: function(){ this.renderStatic(); this.renderLb(); this.render(); if (!this.running) this.intro(); },
+  leave: function(){ this.stop(); },
+  onLevel: function(){ this.stop(); this.target = null; this.score = 0; this.bits = [0,0,0,0,0,0,0,0]; this.renderStatic(); this.renderLb(); this.render(); if (activeId() === 'blitz') this.intro(); },
+  y12: function(){ return LEVEL === 'y12'; },
+  places: function(){ return this.y12() ? [-128,64,32,16,8,4,2,1] : [128,64,32,16,8,4,2,1]; },
+  value: function(){ var p = this.places(), s = 0; for (var i = 0; i < 8; i++) if (this.bits[i]) s += p[i]; return s; },
+  pattern: function(){ return parseInt(this.bits.join(''), 2); },
+  binStr: function(v){ var b = ('00000000' + v.toString(2)).slice(-8); return b.slice(0, 4) + ' ' + b.slice(4); },
+  makeChoices: function(v){
+    var c = [v], ks = shuffle([0,1,2,3,4,5,6,7]);
+    for (var i = 0; i < ks.length && c.length < 4; i++) { var x = v ^ (1 << ks[i]); if (x > 0 && c.indexOf(x) < 0) c.push(x); }
+    return shuffle(c);
+  },
+  pick: function(v){
+    if (!this.running || this.locked || !this.target || this.target.kind !== 'read') return;
+    var self = this, ok = v === this.target.val;
+    this.locked = true;
+    if (ok) { this.score++; $('#blitzScore').textContent = this.score; }
+    $('#blitzTargetPanel').classList.add(ok ? 'good' : 'bad');
+    if (!ok) $('#blitzSub').textContent = 'Not quite: it was ' + this.target.val;
+    $$('#blitzChoices .choice').forEach(function(b){ if (+b.dataset.choice === self.target.val) b.classList.add('right'); });
+    setTimeout(function(){
+      $('#blitzTargetPanel').classList.remove('good'); $('#blitzTargetPanel').classList.remove('bad');
+      self.locked = false;
+      if (self.running) { self.newTarget(); self.render(); }
+    }, ok ? 350 : 1100);
+  },
+  hex2: function(v){ return ('0' + v.toString(16).toUpperCase()).slice(-2); },
+  fmtNum: function(v){ return v < 0 ? '−' + Math.abs(v) : String(v); },
+
+  renderStatic: function(){
+    $('#blitzHow').innerHTML = this.y12()
+      ? 'Tap the bits to switch them between 0 and 1.<br><br><b>Sixth form rules:</b> this is 8-bit <b>two’s complement</b>, so the left bit is worth <b>−128</b>. You’ll get positive numbers, negative numbers and hex patterns.<br><br>No running total to help you. 60 seconds.'
+      : '<b>Denary to binary:</b> tap the bits to switch them between 0 and 1. Add up the place values of the 1s to make the number.<br><br><b>Binary to denary:</b> some rounds show a binary number instead. Add up the place values of its 1s and tap the right answer.<br><br>Every correct answer scores 1 point. You have 60 seconds.';
+    $('#blitzLbTitle').textContent = 'Top scores: ' + LVNAME[LEVEL];
+  },
+  intro: function(){
+    var self = this;
+    modal('<h2>Binary Blitz</h2><p>Get as many right as you can in <b>60 seconds</b>. Tap the bits to flip them, or pick the right answer.</p>' +
+      (this.y12() ? '<p style="font-size:18px">Sixth form mode: 8-bit two’s complement. The left bit is worth −128.</p>' : '<p style="font-size:18px">Year 10 mode: convert between binary and denary. Place values 128, 64, 32, 16, 8, 4, 2, 1.</p>') +
+      levelPicker() + '<div class="row"><button type="button" class="amber" id="blitzGo">Start</button><button type="button" class="ghost" id="blitzBack">Back to menu</button></div>');
+    bindLevelPicker();
+    $('#blitzGo').onclick = function(){ closeModal(); self.start(); };
+    $('#blitzBack').onclick = function(){ show('menu'); };
+  },
+  start: function(){
+    var self = this;
+    this.stop();
+    this.running = true; this.score = 0; this.locked = false; this.target = null;
+    this.end = Date.now() + this.dur * 1000;
+    this.newTarget();
+    this.timer = setInterval(function(){ self.tick(); }, 100);
+    this.render();
+  },
+  stop: function(){ this.running = false; clearInterval(this.timer); },
+  tick: function(){
+    var left = (this.end - Date.now()) / 1000;
+    if (left <= 0) { this.finish(); return; }
+    $('#blitzTime').textContent = Math.ceil(left);
+    $('#blitzBar').style.width = (100 * left / this.dur) + '%';
+  },
+  newTarget: function(){
+    var n = this.score, y12 = this.y12(), prev = this.target, t, v;
+    for (var tries = 0; tries < 30; tries++) {
+      if (!y12) {
+        if (n >= 2 && n % 3 === 2) { v = n < 6 ? rand(5, 63) : rand(20, 255); t = { kind: 'read', val: v, label: this.binStr(v), sub: 'What is this binary number in denary?', choices: this.makeChoices(v) }; }
+        else {
+          var min = n < 3 ? 1 : (n < 7 ? 8 : 32), max = n < 3 ? 15 : (n < 7 ? 63 : 255);
+          v = rand(min, max); t = { kind: 'den', val: v, label: String(v), sub: 'Make this number in binary' };
+        }
+      } else {
+        var r = Math.random();
+        if (n < 2 || r < 0.3) { v = rand(n < 2 ? 5 : 16, 127); t = { kind: 'den', val: v, label: String(v), sub: 'Make this number in two’s complement' }; }
+        else if (r < 0.7) { v = -rand(1, 128); t = { kind: 'den', val: v, label: this.fmtNum(v), sub: 'Make this negative number in two’s complement' }; }
+        else { v = rand(1, 255); t = { kind: 'hex', pat: v, label: this.hex2(v), sub: 'Make this hex number in binary' }; }
+      }
+      if (!prev || prev.label !== t.label) break;
+    }
+    this.target = t; this.bits = [0,0,0,0,0,0,0,0];
+  },
+  matches: function(){
+    var t = this.target; if (!t) return false;
+    return t.kind === 'hex' ? this.pattern() === t.pat : this.value() === t.val;
+  },
+  tap: function(i){
+    if (!this.running || this.locked || (this.target && this.target.kind === 'read')) return;
+    this.bits[i] ^= 1; this.render();
+    if (this.matches()) {
+      var self = this; this.score++; this.locked = true;
+      $('#blitzTargetPanel').classList.add('good');
+      $('#blitzScore').textContent = this.score;
+      setTimeout(function(){
+        $('#blitzTargetPanel').classList.remove('good');
+        self.locked = false;
+        if (self.running) { self.newTarget(); self.render(); }
+      }, 280);
+    }
+  },
+  skip: function(){ if (!this.running || this.locked) return; this.newTarget(); this.render(); },
+  clear: function(){ if (!this.running || this.locked) return; this.bits = [0,0,0,0,0,0,0,0]; this.render(); },
+  render: function(){
+    var p = this.places(), self = this, t = this.target;
+    $('#blitzBits').innerHTML = this.bits.map(function(b, i){
+      return '<button type="button" class="bit' + (b ? ' on' : '') + '" data-bit="' + i + '"><span class="pv">' + self.fmtNum(p[i]) + '</span><span class="bv">' + b + '</span></button>';
+    }).join('');
+    $('#blitzScore').textContent = this.score;
+    if (!this.running) { $('#blitzTime').textContent = this.dur; $('#blitzBar').style.width = '100%'; }
+    $('#blitzTarget').textContent = t ? t.label : '?';
+    $('#blitzSub').textContent = t ? t.sub : 'Press Start to play';
+    $('#blitzHexTag').style.display = (t && t.kind === 'hex') ? 'inline-block' : 'none';
+    var live = '';
+    if (this.y12()) live = 'No running total in sixth form mode. Work it out!';
+    else if (t && t.kind === 'hex') live = 'Your bits in hex: ' + this.hex2(this.pattern());
+    else live = 'Your bits add up to: ' + this.value();
+    var reading = !!(t && t.kind === 'read');
+    if (reading) live = 'Add up the place values of the 1s.';
+    $('#blitzLive').textContent = live;
+    $('#blitzBits').style.display = reading ? 'none' : 'grid';
+    $('#blitzChoices').style.display = reading ? 'grid' : 'none';
+    $('#blitzClear').style.visibility = reading ? 'hidden' : 'visible';
+    $('#blitzChoices').innerHTML = reading ? t.choices.map(function(c){ return '<button type="button" class="choice" data-choice="' + c + '">' + c + '</button>'; }).join('') : '';
+  },
+  finish: function(){
+    var self = this, s = this.score;
+    this.stop(); this.locked = false;
+    $('#blitzTime').textContent = 0; $('#blitzBar').style.width = '0%';
+    if (s === 0) { this.intro(); return; }
+    askInitials('Time!', 'You made <b>' + s + '</b> number' + (s === 1 ? '' : 's') + ' in 60 seconds.', function(name){
+      if (name) addScore('oe-blitz-' + LEVEL, { name: name, score: s }, function(a, b){ return b.score - a.score; });
+      self.renderLb(); self.intro();
+    });
+  },
+  renderLb: function(){ renderLb($('#blitzLb'), load('oe-blitz-' + LEVEL), function(e){ return e.score; }, 'No scores yet. Be the first!'); }
+};
+GAMES.blitz = Blitz;
+$('#blitzBits').addEventListener('click', function(e){ var b = e.target.closest('[data-bit]'); if (b) Blitz.tap(+b.dataset.bit); });
+$('#blitzClear').onclick = function(){ Blitz.clear(); };
+$('#blitzChoices').addEventListener('click', function(e){ var b = e.target.closest('[data-choice]'); if (b) Blitz.pick(+b.dataset.choice); });
+$('#blitzSkip').onclick = function(){ Blitz.skip(); };
+$('#blitzNew').onclick = function(){ Blitz.stop(); Blitz.intro(); };
+$('#blitzLbReset').onclick = function(){ if (confirm('Clear the ' + LVNAME[LEVEL] + ' Binary Blitz leaderboard?')) { save('oe-blitz-' + LEVEL, []); Blitz.renderLb(); } };
+
+/* =========================================================
+   BEAT THE MACHINE (MENACE-style noughts and crosses)
+   ========================================================= */
+var PERMS = (function(){
+  var id = [0,1,2,3,4,5,6,7,8], out = [];
+  var rot = id.map(function(j){ var r = Math.floor(j/3), c = j%3; return (2-c)*3 + r; });
+  var ref = id.map(function(j){ var r = Math.floor(j/3), c = j%3; return r*3 + (2-c); });
+  function compose(A, B){ return B.map(function(b){ return A[b]; }); }
+  var cur = id;
+  for (var k = 0; k < 4; k++) { out.push(cur); out.push(compose(cur, ref)); cur = compose(cur, rot); }
+  return out;
+})();
+var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+var Menace = {
+  brain: null, board: [], hist: [], turn: 'X', over: true, thinking: false, showThink: false, last: -1, winLine: null, timers: [],
+
+  init: function(){
+    this.brain = loadVal('oe-menace-brain', {});
+    if (typeof this.brain !== 'object' || Array.isArray(this.brain) || !this.brain) this.brain = {};
+    this.showThink = LEVEL === 'y12';
+  },
+  enter: function(){
+    this.renderStatic(); this.renderStats(); this.renderHof();
+    if (this.over) this.newGame();
+    else { this.render(); if (this.turn === 'X') this.machineTurn(); }
+  },
+  leave: function(){ this.clearTimers(); this.thinking = false; },
+  onLevel: function(){ this.showThink = LEVEL === 'y12'; this.renderStatic(); this.render(); },
+  clearTimers: function(){ this.timers.forEach(clearTimeout); this.timers = []; },
+  later: function(fn, ms){ this.timers.push(setTimeout(fn, ms)); },
+
+  canon: function(b){
+    var best = null;
+    for (var t = 0; t < PERMS.length; t++) {
+      var P = PERMS[t], s = '';
+      for (var j = 0; j < 9; j++) s += b[P[j]] || '-';
+      if (best === null || s < best.s) best = { s: s, P: P };
+    }
+    return best;
+  },
+  box: function(s){
+    var bx = this.brain[s];
+    if (!bx) {
+      var filled = 0; for (var j = 0; j < 9; j++) if (s[j] !== '-') filled++;
+      var init = filled === 0 ? 4 : (filled <= 2 ? 3 : (filled <= 4 ? 2 : 1));
+      bx = []; for (j = 0; j < 9; j++) bx.push(s[j] === '-' ? init : 0);
+      this.brain[s] = bx;
+    }
+    return bx;
+  },
+  choose: function(b){
+    var c = this.canon(b), bx = this.box(c.s), total = 0, j;
+    for (j = 0; j < 9; j++) if (c.s[j] === '-') total += bx[j];
+    if (total <= 0) return null;
+    var r = Math.random() * total;
+    for (j = 0; j < 9; j++) {
+      if (c.s[j] !== '-') continue;
+      r -= bx[j];
+      if (r < 0 && bx[j] > 0) return { key: c.s, j: j, cell: c.P[j] };
+    }
+    for (j = 8; j >= 0; j--) if (c.s[j] === '-' && bx[j] > 0) return { key: c.s, j: j, cell: c.P[j] };
+    return null;
+  },
+  beadsFor: function(b){
+    var c = this.canon(b), bx = this.box(c.s), out = [];
+    for (var j = 0; j < 9; j++) if (c.s[j] === '-') out[c.P[j]] = bx[j];
+    return out;
+  },
+  winner: function(b){
+    for (var i = 0; i < LINES.length; i++) { var L = LINES[i]; if (b[L[0]] && b[L[0]] === b[L[1]] && b[L[0]] === b[L[2]]) return { w: b[L[0]], line: L }; }
+    for (i = 0; i < 9; i++) if (!b[i]) return null;
+    return { w: 'D', line: null };
+  },
+  reward: function(res, hist){
+    var d = res === 'X' ? 3 : (res === 'D' ? 1 : -1), self = this;
+    hist.forEach(function(h){ var bx = self.box(h.key); bx[h.j] = Math.max(0, bx[h.j] + d); });
+  },
+
+  newGame: function(){
+    this.clearTimers();
+    this.board = ['','','','','','','','','']; this.hist = []; this.turn = 'X'; this.over = false; this.last = -1; this.winLine = null;
+    $('#menaceSub').textContent = '';
+    this.render();
+    this.machineTurn();
+  },
+  machineTurn: function(){
+    var self = this;
+    if (this.over) return;
+    this.thinking = true;
+    this.msg(this.showThink ? 'The machine is opening its matchbox for this position...' : 'The machine is thinking...');
+    this.render();
+    this.later(function(){
+      var c = self.choose(self.board);
+      self.thinking = false;
+      if (!c) { self.end('O', true); return; }
+      self.board[c.cell] = 'X'; self.hist.push({ key: c.key, j: c.j }); self.last = c.cell;
+      var w = self.winner(self.board);
+      if (w) { self.end(w.w, false, w.line); return; }
+      self.turn = 'O'; self.msg('Your turn: tap a square.'); self.render();
+    }, this.showThink ? 1500 : 650);
+  },
+  tap: function(i){
+    if (this.over || this.turn !== 'O' || this.board[i]) return;
+    this.board[i] = 'O'; this.last = i;
+    var w = this.winner(this.board);
+    if (w) { this.end(w.w, false, w.line); return; }
+    this.turn = 'X'; this.machineTurn();
+  },
+  end: function(res, resigned, line){
+    var self = this;
+    this.over = true; this.winLine = line || null; this.thinking = false;
+    this.reward(res, this.hist);
+    save('oe-menace-brain', this.brain);
+    var log = load('oe-menace-log'); log.push(res); save('oe-menace-log', log.slice(-2000));
+    var head, sub;
+    if (resigned) { head = 'The machine resigns. You win!'; sub = 'It has no beads left for this position, so it gives up. It takes a bead away from every move it made this game.'; }
+    else if (res === 'X') { head = 'The machine wins!'; sub = 'It adds 3 beads to every move it made, so it’s more likely to play them again.'; }
+    else if (res === 'D') { head = 'It’s a draw.'; sub = 'The machine adds 1 bead to every move it made. A draw is better than losing.'; }
+    else { head = 'You beat the machine!'; sub = 'It takes a bead away from every move it made, so it’s less likely to make those mistakes again.'; }
+    this.msg(head); $('#menaceSub').textContent = sub;
+    this.render(); this.renderStats();
+    if (res === 'O') {
+      var n = log.length;
+      this.later(function(){
+        askInitials('You beat it!', 'You beat the machine in game <b>' + n + '</b> of the evening. It will learn from this.', function(name){
+          if (name) { var h = load('oe-menace-hof'); h.push({ name: name, game: n }); save('oe-menace-hof', h.slice(-100)); self.renderHof(); }
+        });
+      }, 700);
+    }
+  },
+  train: function(n){
+    var self = this, results = { X: 0, O: 0, D: 0 };
+    for (var g = 0; g < n; g++) {
+      var b = ['','','','','','','','',''], hist = [], res = null;
+      while (!res) {
+        var c = self.choose(b);
+        if (!c) { res = 'O'; break; }
+        b[c.cell] = 'X'; hist.push({ key: c.key, j: c.j });
+        var w = self.winner(b); if (w) { res = w.w; break; }
+        var empty = []; for (var i = 0; i < 9; i++) if (!b[i]) empty.push(i);
+        b[empty[Math.floor(Math.random() * empty.length)]] = 'O';
+        w = self.winner(b); if (w) { res = w.w; break; }
+      }
+      self.reward(res, hist); results[res]++;
+    }
+    save('oe-menace-brain', this.brain);
+    save('oe-menace-trained', loadVal('oe-menace-trained', 0) + n);
+    this.renderStats();
+    $('#menaceSub').textContent = 'Practice done: in ' + n + ' games against a random player it won ' + results.X + ', drew ' + results.D + ' and lost ' + results.O + '.';
+  },
+  resetBrain: function(){
+    this.brain = {}; save('oe-menace-brain', {}); save('oe-menace-log', []); save('oe-menace-trained', 0);
+    this.renderStats(); this.newGame();
+    $('#menaceSub').textContent = 'Brain wiped. The machine is back to playing at random.';
+  },
+
+  msg: function(t){ $('#menaceMsg').textContent = t; },
+  render: function(){
+    var self = this, beads = null, total = 0;
+    if (this.thinking && this.showThink && !this.over) {
+      beads = this.beadsFor(this.board);
+      beads.forEach(function(v){ if (v) total += v; });
+    }
+    $('#ttt').innerHTML = this.board.map(function(v, i){
+      var cls = 'cell' + (v === 'O' ? ' o' : '') + (self.winLine && self.winLine.indexOf(i) >= 0 ? ' win' : '') + (i === self.last && !self.winLine ? ' last' : '');
+      var inner = v;
+      var style = '';
+      if (!v && beads) {
+        var b = beads[i] || 0, share = total ? b / total : 0;
+        var k = 0.06 + share * 0.8, mix = function(c){ return Math.round(255 + (c - 255) * k); };
+        style = ' style="background:rgb(' + mix(31) + ',' + mix(58) + ',' + mix(95) + ')"';
+        inner = '<span class="bd" style="color:' + (share > 0.45 ? '#fff' : '#13202E') + '">' + b + '</span><span class="bl" style="color:' + (share > 0.45 ? '#fff' : '#13202E') + '">bead' + (b === 1 ? '' : 's') + '</span>';
+      }
+      return '<button type="button" class="' + cls + '" data-cell="' + i + '"' + style + '>' + inner + '</button>';
+    }).join('');
+    $('#thinkBtn').textContent = 'Show its thinking: ' + (this.showThink ? 'on' : 'off');
+  },
+  renderStatic: function(){
+    $('#menaceHow').innerHTML = LEVEL === 'y12'
+      ? 'The machine keeps a <b>matchbox</b> for every position it has seen. Each box holds <b>beads</b>, one colour for each possible move. It picks a bead at random, so moves with more beads are more likely.<br><br>Win: +3 beads on every move it played. Draw: +1. Lose: −1.<br><br>This is <b>reinforcement learning</b>: no one programs the strategy; it learns from rewards. Rotations and reflections of a board share one box, which cuts the number of boxes needed.'
+      : 'The machine keeps a <b>matchbox</b> for every board it has seen. Each box holds <b>beads</b> for the squares it could play. It picks a bead at random.<br><br>If it <b>wins</b>, it adds beads for those moves. If it <b>loses</b>, it takes beads away.<br><br>Nobody teaches it how to play. It gets better just by playing lots of games, like you.';
+  },
+  renderStats: function(){
+    var log = load('oe-menace-log'), c = { X: 0, O: 0, D: 0 };
+    log.forEach(function(r){ c[r] = (c[r] || 0) + 1; });
+    $('#mGames').textContent = log.length; $('#mMachine').textContent = c.X; $('#mDraws').textContent = c.D; $('#mHumans').textContent = c.O;
+    var col = { X: '#1F3A5F', D: '#A9B3BF', O: '#F2A93B' };
+    $('#mStrip').innerHTML = log.slice(-60).map(function(r){ return '<i style="background:' + col[r] + '"></i>'; }).join('') || '<span style="font-size:14px;color:var(--muted)">No games yet tonight.</span>';
+    var boxes = Object.keys(this.brain).length, trained = loadVal('oe-menace-trained', 0);
+    $('#brainInfo').innerHTML = 'Matchboxes used so far: <b>' + boxes + '</b>. Practice games: <b>' + trained + '</b>. The original MENACE, built by Donald Michie in 1961, used 304 real matchboxes.<br>Practice games make it stronger quickly. Its brain is saved on this computer between visitors.';
+  },
+  renderHof: function(){ renderLb($('#hof'), load('oe-menace-hof').slice().reverse(), function(e){ return 'game ' + e.game; }, 'Nobody yet. Beat it to get on here!'); }
+};
+GAMES.menace = Menace;
+Menace.init();
+$('#ttt').addEventListener('click', function(e){ var b = e.target.closest('[data-cell]'); if (b) Menace.tap(+b.dataset.cell); });
+$('#menaceNew').onclick = function(){ Menace.newGame(); };
+$('#thinkBtn').onclick = function(){ Menace.showThink = !Menace.showThink; Menace.render(); };
+$('#trainBtn').onclick = function(){ Menace.train(200); };
+$('#brainReset').onclick = function(){ if (confirm('Wipe everything the machine has learned and its game record?')) Menace.resetBrain(); };
+
+/* =========================================================
+   PHISH OR LEGIT
+   ========================================================= */
+var PHISH = [
+  { lv:'y10', ans:'scam', type:'email', ctx:'You bank with Quillbank.', from:'Quillbank Security', addr:'security@quil1bank-alerts.com', subj:'URGENT: Your account will be closed in 24 hours',
+    body:'<p>Dear Customer,</p><p>We have detected unusual activity on your account. You must verify your details within 24 hours or your account will be permanently closed.</p>', link:{ text:'Verify my account', to:'http://quil1bank-alerts.com/verify' },
+    why:'It rushes you with a threat, doesn’t use your name, and the address has a 1 instead of an l. Banks never ask you to verify your details through an email link.' },
+  { lv:'y10', ans:'safe', type:'email', ctx:'Your name is Sam. You ordered a game from Gamevault last week.', from:'ParcelPigeon', addr:'updates@parcelpigeon.co.uk', subj:'Your parcel is out for delivery',
+    body:'<p>Hi Sam,</p><p>Your Gamevault order will arrive today between 1pm and 3pm. You don’t need to do anything.</p>', link:{ text:'Track your parcel', to:'https://www.parcelpigeon.co.uk/track/48213' },
+    why:'It uses your name, matches something you ordered, and the sender and the link both belong to parcelpigeon.co.uk. It doesn’t ask for passwords, payment or anything urgent.' },
+  { lv:'y10', ans:'scam', type:'sms', ctx:'You aren’t expecting any parcels.', from:'07700 900461',
+    body:'ParcelPigeon: We missed you today. A £1.45 redelivery fee is due before your parcel is returned. Pay now: parcelpigeon-redelivery.info',
+    why:'It comes from an ordinary mobile number, asks for a small fee and gives a deadline. The link isn’t parcelpigeon.co.uk. Tiny fees are a trick to get your card details.' },
+  { lv:'y10', ans:'scam', type:'email', ctx:'You use StreamFox to watch films.', from:'StreamFox Rewards', addr:'winner@streamfox-prizes.net', subj:'Congratulations, you’ve won a free year!',
+    body:'<p>You have been randomly selected to receive 12 months of StreamFox for free!</p><p>Claim in the next 60 minutes. Just enter your card details to pay the £0.99 admin fee.</p>', link:{ text:'Claim my prize', to:'http://streamfox-prizes.net/claim' },
+    why:'You can’t win a competition you never entered. A countdown plus card details for a “free” prize is a classic scam, and the sender isn’t streamfox.com.' },
+  { lv:'y10', ans:'safe', type:'email', ctx:'You’re thinking of applying to Hillcrest College.', from:'Hillcrest College', addr:'office@hillcrestcollege.sch.uk', subj:'Open evening: Thursday at 6pm',
+    body:'<p>Dear parents and students,</p><p>Our open evening is on Thursday from 6pm to 8pm. There’s no need to book, just come along. We look forward to meeting you.</p>',
+    why:'You were expecting news from the college, it comes from the college’s own address, and it has no links or attachments and asks for nothing.' },
+  { lv:'y10', ans:'scam', type:'web', ctx:'A comment under a gaming video says you can get free Gamevault coins on this site.', url:'http://gamevault-free-coins.com/login', https:false, brand:'Gamevault', heading:'Claim 10,000 FREE coins!', fields:['Gamevault username','Password'], btn:'Claim coins', note:'Log in with your Gamevault account to receive your coins instantly.',
+    why:'Free in-game money is one of the most common ways gamers lose their accounts. The site isn’t gamevault.com, and it isn’t even using https.' },
+  { lv:'y10', ans:'safe', type:'web', ctx:'You typed gamevault.com into your browser yourself.', url:'https://www.gamevault.com/login', https:true, brand:'Gamevault', heading:'Sign in', fields:['Email address','Password'], btn:'Sign in', note:'New here? Create an account.',
+    why:'You typed the address yourself, the domain is gamevault.com and the connection uses https. That’s the safest way to log in.' },
+  { lv:'y10', ans:'scam', type:'email', ctx:'Jordan is in your class, but you haven’t spoken for weeks.', from:'Jordan K', addr:'jordan.k@inboxly.net', subj:'is this you in this video??',
+    body:'<p>omg look at this</p>', link:{ text:'video_1182.mp4', to:'http://vid-share.click/watch?id=1182' },
+    why:'Hacked accounts send messages like this to everyone in the contact list. It’s vague, it plays on your curiosity, and the “video” is really a link to a strange website.' },
+  { lv:'y10', ans:'safe', type:'sms', ctx:'You’re logging in to your Quillbank app right now.', from:'Quillbank',
+    body:'Quillbank: Your login code is 482913. Never share this code with anyone. We will never ask you for it.',
+    why:'You asked for this code a moment ago, and it doesn’t ask you to click anything or reply. You type it into the app yourself.' },
+  { lv:'y10', ans:'scam', type:'sms', ctx:'You’re a parent with a teenager.', from:'07700 900218',
+    body:'Hi Mum, I dropped my phone in the bath so this is my new number. Can you send £200 so I can get a new one today? I’ll pay you back. Don’t call, the mic is broken x',
+    why:'This is the “new number” scam. It’s urgent, asks for money and stops you calling to check. Always ring the old number or ask something only they would know.' },
+  { lv:'y10', ans:'scam', type:'email', ctx:'You’re a student at Hillcrest College. College emails come from @hillcrestcollege.sch.uk.', from:'IT Support', addr:'helpdesk@hillcrest-college-support.com', subj:'Your mailbox is full',
+    body:'<p>Your mailbox has reached its limit. Log in within 2 hours or you will stop receiving emails.</p>', link:{ text:'Log in to keep your mailbox', to:'http://hillcrest-college-support.com/login' },
+    why:'The college’s address is hillcrestcollege.sch.uk, but this comes from hillcrest-college-support.com. A deadline and a login link are there to steal your password.' },
+  { lv:'y10', ans:'safe', type:'email', ctx:'You pay for StreamFox every month.', from:'StreamFox', addr:'receipts@streamfox.com', subj:'Your StreamFox receipt',
+    body:'<p>Thanks for watching. We’ve taken your monthly payment of £8.99 for StreamFox Standard.</p><p>You can change your plan at any time in the app.</p>',
+    why:'An expected receipt from streamfox.com that sends you to the app, not to a link. Nothing is urgent and nothing is asked of you.' },
+
+  { lv:'y12', ans:'scam', type:'web', ctx:'An email asked you to check a payment. You clicked its link and landed here.', url:'https://quillbank.co.uk.account-verify.net/login', https:true, brand:'Quillbank', heading:'Log in to online banking', fields:['Customer number','Password'], btn:'Log in', note:'For your security, you will be asked to confirm your card number after logging in.',
+    why:'The padlock only means the connection is encrypted; scammers can get one too. Read the domain from the right: it’s account-verify.net, and “quillbank.co.uk” is just a subdomain they made up.' },
+  { lv:'y12', ans:'safe', type:'web', ctx:'You went to quillbank.co.uk yourself and clicked “Log in”.', url:'https://online.quillbank.co.uk/login', https:true, brand:'Quillbank', heading:'Log in to online banking', fields:['Customer number','Password'], btn:'Log in', note:'Never share your one-time codes with anyone.',
+    why:'online.quillbank.co.uk is a subdomain of quillbank.co.uk, so the bank owns it. You also got there from the real site.' },
+  { lv:'y12', ans:'scam', type:'email', ctx:'You pay for StreamFox every month.', from:'StreamFox', addr:'billing@strearnfox.com', subj:'Payment failed: update your card',
+    body:'<p>We couldn’t take your last payment. Update your card details within 48 hours to keep watching.</p>', link:{ text:'Update payment details', to:'https://strearnfox.com/billing' },
+    why:'Look closely: “strearnfox” puts an r and an n together to look like an m. Look-alike domains are very hard to spot on a phone screen.' },
+  { lv:'y12', ans:'scam', type:'email', ctx:'You’re waiting for a parcel from ParcelPigeon.', from:'ParcelPigeon', addr:'updates@parcelpigeon.co.uk', subj:'Choose a new delivery slot',
+    body:'<p>We couldn’t deliver your parcel today. Choose a new delivery slot here:</p>', link:{ text:'https://www.parcelpigeon.co.uk/redeliver', to:'http://pp-redeliver.xyz/slot?id=4471' },
+    why:'The link text shows the real website, but it actually goes to pp-redeliver.xyz. Link text can say anything, and a sender’s address can be faked too. Always check where a link really goes.' },
+  { lv:'y12', ans:'safe', type:'email', ctx:'You bought a game on Gamevault last night.', from:'Gamevault', addr:'orders@gamevault.com', subj:'Your receipt: Skyforge Racers',
+    body:'<p>Thanks for your order. Skyforge Racers is now in your library.</p>', link:{ text:'View order', to:'https://store.gamevault.com/orders/90314' },
+    why:'You were expecting it, the sender is gamevault.com and store.gamevault.com is the company’s own subdomain.' },
+  { lv:'y12', ans:'scam', type:'sms', ctx:'You haven’t added anyone new to your bank account.', from:'QUILLBANK',
+    body:'Quillbank: A new payee “M HART” was added to your account. If this was NOT you, secure your account now: shrt.ly/qB7x2',
+    why:'The sender name on a text can be faked. Short links hide where they go. A real bank tells you to open its app or call the number on the back of your card.' },
+  { lv:'y12', ans:'safe', type:'email', ctx:'Your teacher, Ms Patel, said she’d email your project feedback today. You go to Hillcrest College.', from:'Ms R Patel', addr:'r.patel@hillcrestcollege.sch.uk', subj:'Your NEA feedback',
+    body:'<p>Hi,</p><p>As promised, here’s the feedback on your analysis section. Have a read before Thursday’s lesson.</p>', attach:'NEA_analysis_feedback.docx',
+    why:'You were told it was coming, it’s from the college’s domain, and the attachment is an ordinary document.' },
+  { lv:'y12', ans:'scam', type:'email', ctx:'You run a small business. You don’t recognise this supplier.', from:'Accounts Dept', addr:'accounts@brightline-supplies.biz', subj:'Overdue invoice 8812: final reminder',
+    body:'<p>Please find attached the overdue invoice. Payment must be made today to avoid legal action.</p>', attach:'invoice_8812.pdf.exe',
+    why:'The file ends in .exe, so it’s a program, not a PDF. The “.pdf” is there to fool you. An unknown sender and a threat of legal action are red flags too.' },
+  { lv:'y12', ans:'scam', type:'sms', ctx:'You’ve just received a login code you didn’t ask for. Then this arrives.', from:'07700 900733',
+    body:'Quillbank Fraud Team: Someone is trying to access your account. To block them, reply with the 6-digit code we just sent you.',
+    why:'That code is the key to your account. The scammer already has your password and needs the code to log in. No real company will ever ask you to send it back.' },
+  { lv:'y12', ans:'safe', type:'web', ctx:'You just clicked “Forgot password” on streamfox.com.', url:'https://accounts.streamfox.com/reset', https:true, brand:'StreamFox', heading:'Choose a new password', fields:['New password','Confirm new password'], btn:'Save password', note:'This link expires in 30 minutes.',
+    why:'You started the reset yourself, and the page is on accounts.streamfox.com, a subdomain of streamfox.com.' },
+  { lv:'y12', ans:'scam', type:'web', ctx:'A pop-up said your StreamFox payment had failed and sent you here.', url:'https://streamfox.com-billing.help/update', https:true, brand:'StreamFox', heading:'Update your billing details', fields:['Card number','Expiry date','Security code'], btn:'Update', note:'Your account will be suspended if this is not completed today.',
+    why:'The real domain is com-billing.help. “streamfox.com” at the start is only a subdomain, chosen to fool people who read the beginning of the address.' },
+  { lv:'y12', ans:'safe', type:'sms', ctx:'You booked a dentist appointment for Monday.', from:'Smile Dental',
+    body:'Smile Dental: Reminder of your appointment on Monday at 10:30am. Call the surgery if you need to rearrange.',
+    why:'You booked it, there’s no link, and it asks for nothing personal. If you’re unsure, you can call the surgery on the number you already have.' }
+];
+
+var LOCK_SVG = '<svg width="16" height="18" viewBox="0 0 16 18" aria-hidden="true"><rect x="2" y="8" width="12" height="9" rx="2" fill="#13202E"/><path d="M5 8 V5.5 a3 3 0 0 1 6 0 V8" fill="none" stroke="#13202E" stroke-width="2"/></svg>';
+var CLIP_SVG = '<svg width="18" height="20" viewBox="0 0 18 20" aria-hidden="true"><path d="M13 6 L6.5 12.5 a2 2 0 0 0 2.8 2.8 L15.5 9 a4 4 0 0 0 -5.7 -5.7 L3.5 9.6 a6 6 0 0 0 8.5 8.5 L16 14" fill="none" stroke="#13202E" stroke-width="2" stroke-linecap="round"/></svg>';
+
+var Phish = {
+  running: false, qs: [], i: 0, score: 0, correct: 0, t0: 0, answered: false,
+
+  enter: function(){ this.renderStatic(); this.renderLb(); if (!this.running) this.intro(); },
+  leave: function(){},
+  onLevel: function(){ this.running = false; this.renderStatic(); this.renderLb(); this.blank(); if (activeId() === 'phish') this.intro(); },
+  renderStatic: function(){
+    var tips = ['Is it urgent, threatening or too good to be true?', 'Does the sender’s address match the company?', 'Where does the link really go?', 'Is it asking for a password, code or card details?', 'Were you expecting it?'];
+    if (LEVEL === 'y12') tips = tips.concat(['Read a domain from the right: the part just before .com or .co.uk is the real owner.', 'A padlock means encrypted, not trustworthy.', 'Check file extensions: .exe is a program.']);
+    $('#phishTips').innerHTML = tips.map(function(t){ return '<li>' + t + '</li>'; }).join('');
+    $('#phishLbTitle').textContent = 'Top spotters: ' + LVNAME[LEVEL];
+  },
+  blank: function(){
+    $('#phishCtx').textContent = ''; $('#phishCard').innerHTML = ''; $('#phishVerdict').style.display = 'none';
+    $('#phishBtns').style.display = 'flex'; $('#phishQ').textContent = '0/10'; $('#phishScore').textContent = '0';
+  },
+  intro: function(){
+    var self = this;
+    this.blank();
+    modal('<h2>Phish or Legit?</h2><p>You’ll see <b>10</b> emails, texts and websites. Decide if each one is <b>safe</b> or a <b>scam</b>.</p><p style="font-size:18px">Correct answers score 100 points, plus up to 50 more for answering fast.</p>' +
+      levelPicker() + '<div class="row"><button type="button" class="amber" id="phishGo">Start</button><button type="button" class="ghost" id="phishBack">Back to menu</button></div>');
+    bindLevelPicker();
+    $('#phishGo').onclick = function(){ closeModal(); self.start(); };
+    $('#phishBack').onclick = function(){ show('menu'); };
+  },
+  start: function(){
+    var y10 = shuffle(PHISH.filter(function(q){ return q.lv === 'y10'; }));
+    var y12 = shuffle(PHISH.filter(function(q){ return q.lv === 'y12'; }));
+    this.qs = LEVEL === 'y12' ? shuffle(y12.slice(0, 7).concat(y10.slice(0, 3))) : y10.slice(0, 10);
+    this.i = 0; this.score = 0; this.correct = 0; this.running = true;
+    this.showQ();
+  },
+  card: function(q){
+    if (q.type === 'email') {
+      var h = '<div class="mail"><div class="mhead"><div class="av">' + esc(q.from.charAt(0)) + '</div><div><div class="mfrom"><b>' + esc(q.from) + '</b> <span class="addr">&lt;' + esc(q.addr) + '&gt;</span></div><div class="mto">to me</div></div></div>' +
+        '<div class="msubj">' + esc(q.subj) + '</div><div class="mbody">' + q.body + '</div>';
+      if (q.attach) h += '<div class="attach">' + CLIP_SVG + esc(q.attach) + '</div>';
+      if (q.link) h += '<span class="btnlink">' + esc(q.link.text) + '</span><div class="status">Link goes to: <span class="mono">' + esc(q.link.to) + '</span></div>';
+      return h + '</div>';
+    }
+    if (q.type === 'sms') {
+      return '<div class="phone"><div class="pfrom">' + esc(q.from) + '</div><div class="bubble">' + esc(q.body) + '</div></div>';
+    }
+    var f = (q.fields || []).map(function(x){ return '<div class="field">' + esc(x) + '</div>'; }).join('');
+    return '<div class="browser"><div class="bbar"><div class="bdots"><i></i><i></i><i></i></div><div class="urlbox">' + (q.https ? LOCK_SVG : '<span class="nsec">Not secure</span>') + '<span>' + esc(q.url) + '</span></div></div>' +
+      '<div class="page"><div class="brand">' + esc(q.brand) + '</div><h3>' + esc(q.heading) + '</h3>' + f + '<span class="fbtn">' + esc(q.btn || 'Continue') + '</span>' + (q.note ? '<p>' + esc(q.note) + '</p>' : '') + '</div></div>';
+  },
+  showQ: function(){
+    var q = this.qs[this.i];
+    this.answered = false; this.t0 = Date.now();
+    $('#phishCtx').textContent = q.ctx;
+    $('#phishCard').innerHTML = this.card(q);
+    $('#phishVerdict').style.display = 'none';
+    $('#phishBtns').style.display = 'flex';
+    $('#phishQ').textContent = (this.i + 1) + '/' + this.qs.length;
+    $('#phishScore').textContent = this.score;
+  },
+  answer: function(choice){
+    if (!this.running || this.answered) return;
+    this.answered = true;
+    var q = this.qs[this.i], ok = choice === q.ans, secs = (Date.now() - this.t0) / 1000, pts = 0;
+    if (ok) { pts = 100 + Math.max(0, Math.round(50 - secs * 5)); this.score += pts; this.correct++; }
+    var last = this.i === this.qs.length - 1;
+    var v = $('#phishVerdict');
+    v.innerHTML = '<div class="vhead ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Correct! +' + pts : 'Not quite.') + ' It’s ' + (q.ans === 'scam' ? 'a scam.' : 'safe.') + '</div><p>' + q.why + '</p>' +
+      '<div class="actions" style="justify-content:flex-end"><button type="button" class="amber" id="phishNext">' + (last ? 'See my score' : 'Next message') + '</button></div>';
+    v.style.display = 'flex';
+    $('#phishBtns').style.display = 'none';
+    $('#phishScore').textContent = this.score;
+    var self = this;
+    $('#phishNext').onclick = function(){ if (last) self.finish(); else { self.i++; self.showQ(); } };
+  },
+  finish: function(){
+    var self = this, s = this.score, c = this.correct;
+    this.running = false;
+    askInitials('Finished!', 'You spotted <b>' + c + ' out of ' + this.qs.length + '</b> correctly and scored <b>' + s + '</b> points.', function(name){
+      if (name) addScore('oe-phish-' + LEVEL, { name: name, score: s }, function(a, b){ return b.score - a.score; });
+      self.renderLb(); self.intro();
+    });
+  },
+  renderLb: function(){ renderLb($('#phishLb'), load('oe-phish-' + LEVEL), function(e){ return e.score; }, 'No scores yet. Be the first!'); }
+};
+GAMES.phish = Phish;
+$('#btnSafe').onclick = function(){ Phish.answer('safe'); };
+$('#btnScam').onclick = function(){ Phish.answer('scam'); };
+$('#phishNew').onclick = function(){ Phish.running = false; Phish.intro(); };
+$('#phishLbReset').onclick = function(){ if (confirm('Clear the ' + LVNAME[LEVEL] + ' Phish or Legit leaderboard?')) { save('oe-phish-' + LEVEL, []); Phish.renderLb(); } };
+
+/* =========================================================
+   GATE ESCAPE (scenario doors)
+   ========================================================= */
+var AND = function(a,b){ return a & b; }, OR = function(a,b){ return a | b; };
+var DOORS = {
+  vault:  { name:'The bank vault', scene:'The vault only opens when the key card is scanned <b>AND</b> the fingerprint is accepted.', names:['Key card','Fingerprint'], k:2, f:function(a,b){ return a & b; }, best:1, expr:'Q = A &middot; B', hint:'You need one AND gate.' },
+  fire:   { name:'The fire exit', scene:'The fire exit opens if the fire alarm is ringing <b>OR</b> a teacher presses the release button.', names:['Fire alarm','Release button'], k:2, f:function(a,b){ return a | b; }, best:1, expr:'Q = A + B', hint:'You need one OR gate.' },
+  garden: { name:'The garden door', scene:'The garden door locks at night. It only opens when the dark sensor is <b>NOT</b> on.', names:['Dark sensor'], k:1, f:function(a){ return a ? 0 : 1; }, best:1, expr:'Q = <span class="ov">A</span>', hint:'You need one NOT gate.' },
+  lab:    { name:'The science lab', scene:'The lab opens when you have a pass <b>AND</b> the alarm is <b>NOT</b> set.', names:['Pass','Alarm set'], k:2, f:function(a,b){ return a & (b ? 0 : 1); }, best:2, expr:'Q = A &middot; <span class="ov">B</span>', hint:'Put a NOT gate on the alarm, then use an AND gate.' },
+  levers: { name:'The two levers', scene:'Two guards each pull a lever. The door opens if <b>exactly one</b> lever is pulled. If both are pulled, it jams shut.', names:['Left lever','Right lever'], k:2, f:function(a,b){ return a ^ b; }, best:1, expr:'Q = A &oplus; B', hint:'One special gate does this on its own: XOR.' },
+  server: { name:'The server room', scene:'The server room only opens when <b>NEITHER</b> the motion sensor <b>NOR</b> the door sensor detects anything.', names:['Motion sensor','Door sensor'], k:2, f:function(a,b){ return (a | b) ? 0 : 1; }, best:2, expr:'Q = <span class="ov">A + B</span>', hint:'Use an OR gate, then put a NOT gate after it.' },
+  cage:   { name:'The robot cage', scene:'The safety cage stays open <b>unless both</b> robot arms are moving.', names:['Arm 1 moving','Arm 2 moving'], k:2, f:function(a,b){ return (a & b) ? 0 : 1; }, best:2, expr:'Q = <span class="ov">A &middot; B</span>', hint:'Use an AND gate, then put a NOT gate after it.' },
+  final:  { name:'The final escape', scene:'The exit opens if you have the code <b>AND</b> the key, <b>OR</b> if the head of security presses the override.', names:['Code','Key','Override'], k:3, f:function(a,b,c){ return (a & b) | c; }, best:2, expr:'Q = A &middot; B + C', hint:'AND the code and key together, then OR the result with the override.' },
+  rocket: { name:'Rocket launch', scene:'The rocket only launches when the fuel is ready <b>AND</b> at least one of the two commanders gives the go.', names:['Fuel ready','Commander 1','Commander 2'], k:3, f:function(a,b,c){ return a & (b | c); }, best:2, expr:'Q = A &middot; (B + C)', hint:'OR the two commanders, then AND the result with the fuel.' },
+  parity: { name:'The parity lock', scene:'This lock opens when an <b>odd number</b> of the three switches are on.', names:['Switch 1','Switch 2','Switch 3'], k:3, f:function(a,b,c){ return a ^ b ^ c; }, best:2, expr:'Q = A &oplus; B &oplus; C', hint:'XOR gives 1 for an odd number of 1s. Chain two of them.' },
+  vote:   { name:'Majority vote', scene:'Three judges vote. The door opens when <b>at least two</b> of them vote yes.', names:['Judge 1','Judge 2','Judge 3'], k:3, f:function(a,b,c){ return (a + b + c) >= 2 ? 1 : 0; }, best:4, expr:'Q = A &middot; B + B &middot; C + A &middot; C', hint:'Either A and B are both 1, or exactly one of them is and C is 1. Try AND, XOR, AND, OR.' }
+};
+var GATE_RUNS = {
+  y10: ['vault','fire','garden','lab','levers','server','cage','final'],
+  y12: ['vault','levers','cage','lab','final','rocket','parity','vote']
+};
+function LV(){ return GATE_RUNS[LEVEL].map(function(k){ return DOORS[k]; }); }
+
+var GW = 110, GH = 80, OUTX = 850, OUTY = 280;
+var INPUT_Y = { 1: [280], 2: [190, 370], 3: [130, 280, 430] };
+var SLOTS = [[300,80],[300,240],[300,400],[480,80],[480,240],[480,400],[650,160],[650,330]];
+
+var Gates = {
+  lv: 0, gates: [], wires: [], ins: [0,0,0], nextId: 1, sel: null, src: null, dst: null, drag: null,
+  running: false, t0: 0, timer: null, cleared: 0, solved: false,
+
+  enter: function(){
+    this.renderLb();
+    if (!this.running) { this.loadLevel(this.lv); this.intro(); } else this.startTimer();
+  },
+  leave: function(){ this.stopTimer(); },
+  onLevel: function(){
+    this.running = false; this.stopTimer(); this.cleared = 0; $('#runTime').textContent = '0:00';
+    this.loadLevel(0); this.renderLb();
+    if (activeId() === 'gates') this.intro();
+  },
+  intro: function(){
+    var self = this;
+    modal('<h2>Gate Escape</h2><p>You’re locked in! Each door has a rule written on it. Build a circuit with logic gates that follows the rule and the door opens.</p>' +
+      '<p style="font-size:17px;color:var(--muted)">' + (LEVEL === 'y10' ? 'Year 10 run: 8 doors that start easy and get harder. ' : 'Sixth form run: 8 doors, ending with 3-input puzzles. ') +
+      'Tap a switch’s dot, then a gate’s dot, to draw a wire. Tap a wire to delete it. Stuck? Press <b>Gate guide</b> or <b>Hint</b>.</p>' +
+      levelPicker() + '<div class="row"><button type="button" class="amber" id="goRun">Start the escape</button><button type="button" class="ghost" id="goGuide">Gate guide</button><button type="button" class="ghost" id="goMenu">Back to menu</button></div>');
+    bindLevelPicker();
+    $('#goRun').onclick = function(){ closeModal(); self.startRun(); };
+    $('#goGuide').onclick = function(){ gateGuide(function(){ self.intro(); }); };
+    $('#goMenu').onclick = function(){ show('menu'); };
+  },
+  startRun: function(){ this.running = true; this.cleared = 0; this.t0 = Date.now(); this.loadLevel(0); this.startTimer(); },
+  startTimer: function(){
+    var self = this; clearInterval(this.timer);
+    this.timer = setInterval(function(){ if (self.running) $('#runTime').textContent = fmtTime((Date.now() - self.t0) / 1000); }, 500);
+  },
+  stopTimer: function(){ clearInterval(this.timer); },
+  elapsed: function(){ return (Date.now() - this.t0) / 1000; },
+
+  loadLevel: function(i){
+    var levels = LV(); if (i >= levels.length) i = 0;
+    this.lv = i; this.gates = []; this.wires = []; this.ins = [0,0,0]; this.sel = null; this.src = null; this.dst = null; this.solved = false;
+    var L = levels[i];
+    $('#lvNum').textContent = 'DOOR ' + (i + 1) + ' OF ' + levels.length;
+    $('#lvName').textContent = L.name;
+    $('#lvScene').innerHTML = L.scene;
+    $('#lvMap').innerHTML = L.names.map(function(n, j){ return '<span><b>' + 'ABC'.charAt(j) + '</b> = ' + n + '</span>'; }).join('') + '<span><b>Q</b> = door open</span>';
+    $('#lvHint').textContent = '';
+    $('#cleared').textContent = this.cleared;
+    this.say('Add a gate, then tap a switch’s dot and a gate’s input dot to wire them.');
+    this.render();
+  },
+  say: function(t){ $('#gateMsg').textContent = t; },
+
+  gate: function(id){ for (var i = 0; i < this.gates.length; i++) if (this.gates[i].id === id) return this.gates[i]; return null; },
+  nIn: function(g){ return g.type === 'NOT' ? 1 : 2; },
+  srcPos: function(s){
+    if (s.charAt(0) === 'i') { var k = LV()[this.lv].k; return { x: 130, y: INPUT_Y[k][+s.slice(2)] }; }
+    var g = this.gate(s); return { x: g.x + GW, y: g.y + 40 };
+  },
+  dstPos: function(t, p){
+    if (t === 'out') return { x: OUTX, y: OUTY };
+    var g = this.gate(t);
+    if (g.type === 'NOT') return { x: g.x, y: g.y + 40 };
+    return { x: g.x, y: g.y + (p === 0 ? 22 : 58) };
+  },
+  val: function(s, ins, seen){
+    if (s.charAt(0) === 'i') return ins[+s.slice(2)];
+    seen = seen || {};
+    if (seen[s]) return null;
+    var g = this.gate(s); if (!g) return null;
+    var next = {}; for (var key in seen) next[key] = 1; next[s] = 1;
+    var v = [];
+    for (var p = 0; p < this.nIn(g); p++) {
+      var w = this.wireTo(s, p); if (!w) return null;
+      var x = this.val(w.s, ins, next); if (x === null) return null;
+      v.push(x);
+    }
+    switch (g.type) {
+      case 'AND': return v[0] & v[1];
+      case 'OR': return v[0] | v[1];
+      case 'XOR': return v[0] ^ v[1];
+      case 'NOT': return v[0] ? 0 : 1;
+    }
+    return null;
+  },
+  wireTo: function(t, p){ for (var i = 0; i < this.wires.length; i++) { var w = this.wires[i]; if (w.t === t && w.p === p) return w; } return null; },
+  outVal: function(ins){ var w = this.wireTo('out', 0); return w ? this.val(w.s, ins) : null; },
+  usedGates: function(){
+    var self = this, used = {};
+    function walk(s){ if (s.charAt(0) === 'i' || used[s]) return; used[s] = 1; var g = self.gate(s); if (!g) return; for (var p = 0; p < self.nIn(g); p++) { var w = self.wireTo(s, p); if (w) walk(w.s); } }
+    var w = this.wireTo('out', 0); if (w) walk(w.s);
+    return Object.keys(used).length;
+  },
+  rows: function(){
+    var k = LV()[this.lv].k, out = [];
+    for (var r = 0; r < (1 << k); r++) { var bits = []; for (var b = k - 1; b >= 0; b--) bits.push((r >> b) & 1); out.push(bits); }
+    return out;
+  },
+
+  addGate: function(type){
+    if (!this.running) return;
+    if (this.gates.length >= 10) { this.say('That’s plenty of gates. Delete one first.'); return; }
+    var pos = null;
+    for (var i = 0; i < SLOTS.length && !pos; i++) {
+      var s = SLOTS[i], free = this.gates.every(function(g){ return Math.abs(g.x - s[0]) > 70 || Math.abs(g.y - s[1]) > 60; });
+      if (free) pos = s;
+    }
+    if (!pos) pos = [260 + Math.random() * 440, 60 + Math.random() * 380];
+    var g = { id: 'g' + (this.nextId++), type: type, x: pos[0], y: pos[1] };
+    this.gates.push(g); this.sel = g.id;
+    this.say('Drag the ' + type + ' gate where you want it. Now wire it up.');
+    this.render();
+  },
+  removeGate: function(id){
+    this.gates = this.gates.filter(function(g){ return g.id !== id; });
+    this.wires = this.wires.filter(function(w){ return w.s !== id && w.t !== id; });
+    if (this.src === id) this.src = null;
+    if (this.dst && this.dst.t === id) this.dst = null;
+    this.sel = null; this.render();
+  },
+  port: function(node, port){
+    if (port === 'o') this.src = (this.src === node ? null : node);
+    else { var p = +port; this.dst = (this.dst && this.dst.t === node && this.dst.p === p) ? null : { t: node, p: p }; }
+    if (this.src && this.dst) {
+      if (this.src === this.dst.t) { this.say('A gate can’t feed itself. Try another dot.'); this.dst = null; this.render(); return; }
+      var d = this.dst;
+      this.wires = this.wires.filter(function(w){ return !(w.t === d.t && w.p === d.p); });
+      this.wires.push({ s: this.src, t: d.t, p: d.p });
+      this.src = null; this.dst = null;
+      this.say('Wired! Flip the switches or tap the table rows to test it.');
+    } else if (this.src) this.say('Now tap a gate’s input dot (left side) or the door’s dot.');
+    else if (this.dst) this.say('Now tap an output dot: a switch or the right side of a gate.');
+    this.render();
+  },
+
+  gateShape: function(type){
+    var st = 'stroke="#13202E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"';
+    var leads2 = '<path d="M0 22 H20 M0 58 H20" ' + st + ' fill="none"/>';
+    var lead1 = '<path d="M0 40 H18" ' + st + ' fill="none"/>';
+    var outLead = '<path d="M92 40 H110" ' + st + ' fill="none"/>';
+    switch (type) {
+      case 'AND': return leads2 + outLead + '<path d="M18 6 H56 A34 34 0 0 1 56 74 H18 Z" fill="#fff" ' + st + '/>';
+      case 'OR': return leads2 + outLead + '<path d="M12 6 Q58 6 92 40 Q58 74 12 74 Q30 40 12 6 Z" fill="#fff" ' + st + '/>';
+      case 'XOR': return '<path d="M0 22 H16 M0 58 H16" ' + st + ' fill="none"/>' + outLead + '<path d="M8 6 Q24 40 8 74" fill="none" ' + st + '/><path d="M20 6 Q62 6 94 40 Q62 74 20 74 Q36 40 20 6 Z" fill="#fff" ' + st + '/>';
+      case 'NOT': return lead1 + '<path d="M100 40 H110" ' + st + ' fill="none"/><path d="M18 10 L80 40 L18 70 Z" fill="#fff" ' + st + '/><circle cx="88" cy="40" r="8" fill="#fff" ' + st + '/>';
+    }
+    return '';
+  },
+  render: function(){
+    var self = this, L = LV()[this.lv], k = L.k, ins = this.ins.slice(0, k);
+    var h = '<defs><pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.6" fill="#C9D1DB"/></pattern></defs><rect width="1000" height="560" fill="url(#dots)"/>';
+    this.wires.forEach(function(w, i){
+      var a = self.srcPos(w.s), b = self.dstPos(w.t, w.p), dx = Math.max(40, Math.abs(b.x - a.x) / 2);
+      var d = 'M' + a.x + ' ' + a.y + ' C' + (a.x + dx) + ' ' + a.y + ' ' + (b.x - dx) + ' ' + b.y + ' ' + b.x + ' ' + b.y;
+      var v = self.val(w.s, ins);
+      var col = v === 1 ? '#F2A93B' : (v === 0 ? '#4A5868' : '#A9B3BF');
+      h += '<g data-kind="wire" data-i="' + i + '"><path d="' + d + '" stroke="transparent" stroke-width="22" fill="none"/>' +
+           '<path d="' + d + '" stroke="' + col + '" stroke-width="' + (v === 1 ? 7 : 5) + '" fill="none" stroke-linecap="round"' + (v === null ? ' stroke-dasharray="8 8"' : '') + '/></g>';
+    });
+    INPUT_Y[k].forEach(function(y, i){
+      var on = ins[i] === 1, name = 'ABC'.charAt(i);
+      h += '<g data-kind="switch" data-i="' + i + '" style="cursor:pointer">' +
+           '<rect x="14" y="' + (y - 40) + '" width="100" height="80" rx="14" fill="' + (on ? '#F2A93B' : '#fff') + '" stroke="#13202E" stroke-width="4"/>' +
+           '<text x="44" y="' + (y + 12) + '" text-anchor="middle" font-family="Space Grotesk, Segoe UI, sans-serif" font-weight="700" font-size="34" fill="#13202E">' + name + '</text>' +
+           '<text x="88" y="' + (y + 12) + '" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace" font-weight="600" font-size="32" fill="#13202E">' + (on ? 1 : 0) + '</text>' +
+           '<text x="64" y="' + (y + 62) + '" text-anchor="middle" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-weight="600" font-size="17" fill="#1F3A5F">' + esc(L.names[i]) + '</text></g>';
+      var srcId = 'in' + i, pend = self.src === srcId;
+      h += '<line x1="114" y1="' + y + '" x2="130" y2="' + y + '" stroke="#13202E" stroke-width="4"/>' +
+           '<circle data-kind="port" data-node="' + srcId + '" data-port="o" cx="130" cy="' + y + '" r="13" fill="' + (pend ? '#F2A93B' : '#1F3A5F') + '" stroke="#13202E" stroke-width="3" style="cursor:pointer"/>';
+    });
+    this.gates.forEach(function(g){
+      var selected = self.sel === g.id, v = self.val(g.id, ins);
+      h += '<g data-kind="gate" data-id="' + g.id + '" transform="translate(' + g.x + ' ' + g.y + ')" style="cursor:grab">' +
+           '<rect x="-6" y="-6" width="' + (GW + 12) + '" height="' + (GH + 12) + '" rx="12" fill="' + (selected ? 'rgba(242,169,59,.18)' : 'transparent') + '" stroke="' + (selected ? '#F2A93B' : 'none') + '" stroke-width="3" stroke-dasharray="6 5"/>' +
+           self.gateShape(g.type) +
+           '<text x="' + (g.type === 'NOT' ? 42 : 50) + '" y="' + (GH + 22) + '" text-anchor="middle" font-family="Space Grotesk, Segoe UI, sans-serif" font-weight="700" font-size="18" fill="#13202E">' + g.type + '</text>';
+      for (var p = 0; p < self.nIn(g); p++) {
+        var py = g.type === 'NOT' ? 40 : (p === 0 ? 22 : 58);
+        var pd = self.dst && self.dst.t === g.id && self.dst.p === p;
+        h += '<circle data-kind="port" data-node="' + g.id + '" data-port="' + p + '" cx="0" cy="' + py + '" r="12" fill="' + (pd ? '#F2A93B' : '#fff') + '" stroke="#13202E" stroke-width="3" style="cursor:pointer"/>';
+      }
+      var ps = self.src === g.id;
+      h += '<circle data-kind="port" data-node="' + g.id + '" data-port="o" cx="' + GW + '" cy="40" r="13" fill="' + (ps ? '#F2A93B' : (v === 1 ? '#F2A93B' : '#1F3A5F')) + '" stroke="#13202E" stroke-width="3" style="cursor:pointer"/>';
+      if (selected) h += '<g data-kind="del" data-id="' + g.id + '" style="cursor:pointer"><circle cx="' + (GW + 4) + '" cy="-6" r="17" fill="#B3361F" stroke="#fff" stroke-width="3"/><path d="M' + (GW - 3) + ' -13 L' + (GW + 11) + ' 1 M' + (GW + 11) + ' -13 L' + (GW - 3) + ' 1" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>';
+      h += '</g>';
+    });
+    var q = this.outVal(ins), open = this.solved;
+    var pdOut = this.dst && this.dst.t === 'out';
+    h += '<line x1="' + OUTX + '" y1="' + OUTY + '" x2="870" y2="' + OUTY + '" stroke="#13202E" stroke-width="4"/>' +
+         '<circle data-kind="port" data-node="out" data-port="0" cx="' + OUTX + '" cy="' + OUTY + '" r="13" fill="' + (pdOut ? '#F2A93B' : '#fff') + '" stroke="#13202E" stroke-width="3" style="cursor:pointer"/>' +
+         '<rect x="870" y="130" width="116" height="300" rx="8" fill="' + (open ? '#1F7A4D' : '#13202E') + '" stroke="#13202E" stroke-width="4"/>' +
+         '<rect x="884" y="146" width="88" height="120" rx="4" fill="none" stroke="' + (open ? '#D7EFE2' : '#4A5868') + '" stroke-width="3"/>' +
+         '<rect x="884" y="294" width="88" height="120" rx="4" fill="none" stroke="' + (open ? '#D7EFE2' : '#4A5868') + '" stroke-width="3"/>' +
+         '<circle cx="928" cy="' + OUTY + '" r="20" fill="' + (q === 1 ? '#F2A93B' : (q === 0 ? '#4A5868' : '#2A3A4C')) + '" stroke="#fff" stroke-width="3"/>' +
+         '<text x="928" y="' + (OUTY + 8) + '" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace" font-weight="600" font-size="22" fill="#fff">' + (q === null ? '?' : q) + '</text>' +
+         '<text x="928" y="118" text-anchor="middle" font-family="Space Grotesk, Segoe UI, sans-serif" font-weight="700" font-size="22" fill="' + (open ? '#1F7A4D' : '#13202E') + '">' + (open ? 'OPEN' : 'DOOR Q') + '</text>';
+    $('#board').innerHTML = h;
+    this.renderTable();
+  },
+  renderTable: function(){
+    var self = this, L = LV()[this.lv], k = L.k, names = 'ABC'.slice(0, k).split('');
+    var cur = this.ins.slice(0, k).join(''), allMatch = true;
+    var html = '<tr>' + names.map(function(n){ return '<th>' + n + '</th>'; }).join('') + '<th>Door should be</th><th>Your door</th></tr>';
+    this.rows().forEach(function(r){
+      var t = L.f.apply(null, r), y = self.outVal(r), ok = y === t;
+      if (!ok) allMatch = false;
+      html += '<tr data-row="' + r.join('') + '" class="' + (r.join('') === cur ? 'cur' : '') + '">' + r.map(function(b){ return '<td>' + b + '</td>'; }).join('') +
+              '<td><b>' + t + '</b></td><td class="' + (y === null ? '' : (ok ? 'm' : 'x')) + '">' + (y === null ? '?' : y) + (y === null ? '' : (ok ? ' ✓' : ' ✗')) + '</td></tr>';
+    });
+    $('#tt').innerHTML = html;
+    $$('#tt tr[data-row]').forEach(function(tr){
+      tr.onclick = function(){ var bits = tr.dataset.row.split('').map(Number); for (var i = 0; i < bits.length; i++) self.ins[i] = bits[i]; self.render(); };
+    });
+    if (allMatch && !this.solved && this.running) {
+      this.solved = true;
+      setTimeout(function(){ self.render(); self.levelDone(); }, 350);
+    }
+  },
+  levelDone: function(){
+    var self = this, levels = LV(), L = levels[this.lv];
+    this.cleared++; $('#cleared').textContent = this.cleared;
+    var used = this.usedGates(), last = this.lv === levels.length - 1;
+    var note = used <= L.best ? 'Perfect: the fewest gates possible.' : 'It can be done with ' + L.best + (L.best === 1 ? ' gate.' : ' gates.');
+    modal('<h2>' + L.name + ': open!</h2><p>Your circuit written in Boolean algebra:</p><div class="expr">' + L.expr + '</div>' +
+      '<p>You used <b>' + used + '</b> gate' + (used === 1 ? '' : 's') + '. ' + note + '</p>' +
+      '<div class="row"><button type="button" class="amber" id="nextLv">' + (last ? 'Finish the escape' : 'Next door') + '</button></div>');
+    $('#nextLv').onclick = function(){
+      closeModal();
+      if (last) self.endRun(true); else self.loadLevel(self.lv + 1);
+    };
+  },
+  skip: function(){
+    if (!this.running || this.solved) return;
+    if (this.lv === LV().length - 1) { this.endRun(false); return; }
+    this.loadLevel(this.lv + 1);
+  },
+  endRun: function(finishedAll){
+    if (!this.running) return;
+    var self = this, t = this.elapsed(), n = this.cleared;
+    this.running = false; this.stopTimer();
+    $('#runTime').textContent = fmtTime(t);
+    var after = function(){ self.renderLb(); self.loadLevel(0); self.intro(); };
+    if (n === 0) { after(); return; }
+    askInitials(finishedAll ? 'You escaped!' : 'Run over', 'You opened <b>' + n + '</b> door' + (n === 1 ? '' : 's') + ' in <b>' + fmtTime(t) + '</b>.', function(name){
+      if (name) addScore('oe-gates-' + LEVEL, { name: name, doors: n, time: Math.round(t) }, function(a, b){ return b.doors - a.doors || a.time - b.time; });
+      after();
+    });
+  },
+  renderLb: function(){
+    $('#gateLbTitle').textContent = 'Escape leaderboard: ' + LVNAME[LEVEL];
+    renderLb($('#gateLb'), load('oe-gates-' + LEVEL), function(e){ return e.doors + ' doors &middot; ' + fmtTime(e.time); }, 'No escapes yet. Be the first!');
+  }
+};
+GAMES.gates = Gates;
+
+function gateGuide(back){
+  var rows2 = [[0,0],[0,1],[1,0],[1,1]];
+  var g = [
+    { n:'AND', d:'Output is 1 only when <b>both</b> inputs are 1.', f:function(a,b){ return a & b; } },
+    { n:'OR', d:'Output is 1 when <b>either</b> input is 1 (or both).', f:function(a,b){ return a | b; } },
+    { n:'NOT', d:'<b>Flips</b> the input: 1 becomes 0, 0 becomes 1.', f:null },
+    { n:'XOR', d:'Output is 1 when <b>exactly one</b> input is 1.', f:function(a,b){ return a ^ b; } }
+  ];
+  var html = g.map(function(x){
+    var t = x.f ? '<tr><th>A</th><th>B</th><th>Out</th></tr>' + rows2.map(function(r){ return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td><b>' + x.f(r[0], r[1]) + '</b></td></tr>'; }).join('')
+                : '<tr><th>A</th><th>Out</th></tr><tr><td>0</td><td><b>1</b></td></tr><tr><td>1</td><td><b>0</b></td></tr>';
+    return '<div class="gg"><b>' + x.n + '</b><span>' + x.d + '</span><table class="tt">' + t + '</table></div>';
+  }).join('');
+  modal('<h2>Gate guide</h2><div class="guide">' + html + '</div><div class="row"><button type="button" class="amber" id="ggClose">Got it</button></div>');
+  $('#ggClose').onclick = function(){ if (back) back(); else closeModal(); };
+}
+
+var board = $('#board');
+function toSvg(e){ var pt = board.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(board.getScreenCTM().inverse()); }
+board.addEventListener('pointerdown', function(e){
+  if (!Gates.running) return;
+  var el = e.target.closest('[data-kind]');
+  if (!el) { if (Gates.sel || Gates.src || Gates.dst) { Gates.sel = null; Gates.src = null; Gates.dst = null; Gates.render(); } return; }
+  var kind = el.getAttribute('data-kind');
+  if (kind === 'port') { Gates.port(el.getAttribute('data-node'), el.getAttribute('data-port')); return; }
+  if (kind === 'del') { Gates.removeGate(el.getAttribute('data-id')); return; }
+  if (kind === 'wire') { Gates.wires.splice(+el.getAttribute('data-i'), 1); Gates.say('Wire removed.'); Gates.render(); return; }
+  if (kind === 'switch') { var i = +el.getAttribute('data-i'); Gates.ins[i] = Gates.ins[i] ? 0 : 1; Gates.render(); return; }
+  if (kind === 'gate') {
+    var g = Gates.gate(el.getAttribute('data-id')), p = toSvg(e);
+    Gates.drag = { id: g.id, sx: p.x, sy: p.y, gx: g.x, gy: g.y, moved: false };
+    try { board.setPointerCapture(e.pointerId); } catch(err){}
+    e.preventDefault();
+  }
+});
+board.addEventListener('pointermove', function(e){
+  var d = Gates.drag; if (!d) return;
+  var p = toSvg(e), dx = p.x - d.sx, dy = p.y - d.sy;
+  if (!d.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
+  d.moved = true;
+  var g = Gates.gate(d.id); if (!g) return;
+  g.x = Math.max(160, Math.min(720, d.gx + dx)); g.y = Math.max(10, Math.min(450, d.gy + dy));
+  Gates.render();
+});
+function endDrag(){
+  var d = Gates.drag; if (!d) return; Gates.drag = null;
+  if (!d.moved) { Gates.sel = Gates.sel === d.id ? null : d.id; Gates.render(); }
+}
+board.addEventListener('pointerup', endDrag);
+board.addEventListener('pointercancel', endDrag);
+$$('[data-add]').forEach(function(b){ b.onclick = function(){ Gates.addGate(b.dataset.add); }; });
+$('#clearBoard').onclick = function(){ if (!Gates.running) return; Gates.gates = []; Gates.wires = []; Gates.sel = Gates.src = Gates.dst = null; Gates.render(); };
+$('#hintBtn').onclick = function(){ if (Gates.running) $('#lvHint').textContent = 'Hint: ' + LV()[Gates.lv].hint; };
+$('#guideBtn').onclick = function(){ gateGuide(null); };
+$('#skipBtn').onclick = function(){ Gates.skip(); };
+$('#endRun').onclick = function(){ Gates.endRun(false); };
+$('#gateLbReset').onclick = function(){ if (confirm('Clear the ' + LVNAME[LEVEL] + ' Gate Escape leaderboard?')) { save('oe-gates-' + LEVEL, []); Gates.renderLb(); } };
+
+/* =========================================================
+   SORTING SHOWDOWN
+   ========================================================= */
+var Sort = {
+  n: 8, w: {}, order: [], start: [], sel: [], comps: 0, phase: 'play', mode: 'weigh', log: [],
+  angle: 0, left: '', right: '', anim: null, raceTimer: null, raceSpeed: 650, lanes: [],
+
+  enter: function(){ if (!this.order.length) this.newGame(); this.renderLb(); },
+  leave: function(){},
+  onLevel: function(){ this.setN(LEVEL === 'y10' ? 6 : 8); },
+  setN: function(n){
+    this.n = n;
+    $$('#nSeg button').forEach(function(x){ x.classList.toggle('on', +x.dataset.n === n); });
+    this.newGame();
+  },
+  newGame: function(){
+    this.stopRace();
+    var letters = 'ABCDEFGH'.slice(0, this.n).split('');
+    var pool = []; for (var i = 1; i <= 30; i++) pool.push(i);
+    shuffle(pool);
+    var self = this; this.w = {};
+    letters.forEach(function(l, i){ self.w[l] = pool[i]; });
+    do { this.order = shuffle(letters.slice()); } while (this.isSorted(this.order));
+    this.start = this.order.slice();
+    this.sel = []; this.comps = 0; this.phase = 'play'; this.log = [];
+    this.left = ''; this.right = ''; this.setMode('weigh');
+    $('#playArea').style.display = 'flex'; $('#race').style.display = 'none';
+    $('#sortCheck').disabled = false;
+    this.setAngle(0, true);
+    this.msg('Tap two boxes to weigh them.');
+    this.actions('');
+    this.render(); this.renderLb();
+  },
+  isSorted: function(arr){ for (var i = 1; i < arr.length; i++) if (this.w[arr[i-1]] > this.w[arr[i]]) return false; return true; },
+  msg: function(t){ $('#sortMsg').textContent = t; },
+  actions: function(html){ $('#sortActions').innerHTML = html; },
+  setMode: function(m){
+    this.mode = m; this.sel = [];
+    $('#modeWeigh').classList.toggle('on', m === 'weigh');
+    $('#modeSwap').classList.toggle('on', m === 'swap');
+    if (this.phase === 'play') this.msg(m === 'weigh' ? 'Tap two boxes to weigh them.' : 'Tap two boxes to swap their places.');
+    this.render();
+  },
+  render: function(){
+    var self = this, done = this.phase !== 'play';
+    var correct = this.order.slice().sort(function(a,b){ return self.w[a] - self.w[b]; });
+    $('#boxes').innerHTML = this.order.map(function(l, i){
+      var cls = 'box' + (self.sel.indexOf(l) >= 0 ? ' sel' : '') + (done ? (correct[i] === l ? ' ok' : ' bad') : '');
+      return '<div class="'+cls+'" data-box="'+l+'"><span class="L">'+l+'</span><span class="W">'+(done ? self.w[l]+' kg' : '?')+'</span></div>';
+    }).join('');
+    $('#posrow').innerHTML = this.order.map(function(_, i){ return '<span>'+(i === 0 ? 'lightest' : (i === self.order.length-1 ? 'heaviest' : ''))+'</span>'; }).join('');
+    $('#compCount').textContent = this.comps;
+    var lg = $('#log');
+    if (!this.log.length) lg.innerHTML = '<span style="background:none;color:var(--muted);font-family:var(--body);font-weight:400">Nothing yet.</span>';
+    else lg.innerHTML = this.log.map(function(t){ return '<span>'+t+'</span>'; }).join('');
+    lg.scrollTop = lg.scrollHeight;
+  },
+  tap: function(l){
+    if (this.phase !== 'play') return;
+    var i = this.sel.indexOf(l);
+    if (i >= 0) { this.sel.splice(i, 1); this.render(); return; }
+    this.sel.push(l);
+    if (this.sel.length === 2) {
+      if (this.mode === 'weigh') this.weigh(); else this.swap(this.sel[0], this.sel[1]);
+    }
+    this.render();
+  },
+  weigh: function(){
+    var a = this.sel[0], b = this.sel[1];
+    this.comps++;
+    this.left = a; this.right = b;
+    var heavier = this.w[a] > this.w[b] ? a : b, lighter = heavier === a ? b : a;
+    this.setAngle(heavier === a ? -0.2 : 0.2);
+    this.msg(heavier + ' is heavier than ' + lighter);
+    this.log.push(lighter + ' < ' + heavier);
+    var self = this;
+    this.actions('<button type="button" class="small amber" id="swapNow">Swap '+a+' and '+b+'</button>');
+    $('#swapNow').onclick = function(){ self.swap(a, b); self.actions(''); self.render(); };
+    this.sel = [];
+  },
+  swap: function(a, b){
+    var ia = this.order.indexOf(a), ib = this.order.indexOf(b);
+    this.order[ia] = b; this.order[ib] = a;
+    this.sel = [];
+    if (this.mode === 'swap') this.msg('Swapped ' + a + ' and ' + b + '.');
+    this.actions('');
+  },
+  setAngle: function(target, instant){
+    var self = this; cancelAnimationFrame(this.anim);
+    if (instant) { this.angle = target; this.drawScale(); return; }
+    var from = this.angle, t0 = performance.now();
+    function step(t){
+      var k = Math.min(1, (t - t0) / 450), e = 1 - Math.pow(1 - k, 3);
+      self.angle = from + (target - from) * e; self.drawScale();
+      if (k < 1) self.anim = requestAnimationFrame(step);
+    }
+    this.anim = requestAnimationFrame(step);
+  },
+  drawScale: function(){
+    var cx = 320, cy = 60, L = 210, a = this.angle;
+    var lx = cx - L*Math.cos(a), ly = cy - L*Math.sin(a), rx = cx + L*Math.cos(a), ry = cy + L*Math.sin(a);
+    function pan(x, y, label){
+      var s = '<line x1="'+x+'" y1="'+y+'" x2="'+(x-50)+'" y2="'+(y+70)+'" stroke="#4A5868" stroke-width="3"/>' +
+              '<line x1="'+x+'" y1="'+y+'" x2="'+(x+50)+'" y2="'+(y+70)+'" stroke="#4A5868" stroke-width="3"/>' +
+              '<path d="M'+(x-70)+' '+(y+70)+' Q'+x+' '+(y+100)+' '+(x+70)+' '+(y+70)+' Z" fill="#13202E"/>';
+      if (label) s += '<rect x="'+(x-30)+'" y="'+(y+12)+'" width="60" height="56" rx="8" fill="#C99A5B" stroke="#6B4A22" stroke-width="3"/>' +
+                      '<text x="'+x+'" y="'+(y+52)+'" text-anchor="middle" font-family="Space Grotesk, Segoe UI, sans-serif" font-weight="700" font-size="30" fill="#2A1A10">'+label+'</text>';
+      return s;
+    }
+    $('#scale').innerHTML =
+      '<polygon points="290,225 350,225 320,60" fill="#1F3A5F"/>' +
+      '<line x1="'+lx+'" y1="'+ly+'" x2="'+rx+'" y2="'+ry+'" stroke="#13202E" stroke-width="10" stroke-linecap="round"/>' +
+      '<circle cx="320" cy="60" r="10" fill="#F2A93B" stroke="#13202E" stroke-width="3"/>' +
+      pan(lx, ly, this.left) + pan(rx, ry, this.right);
+  },
+  check: function(){
+    if (this.phase !== 'play') return;
+    this.phase = 'done'; this.sel = []; this.actions('');
+    $('#sortCheck').disabled = true;
+    this.render();
+    var self = this, ok = this.isSorted(this.order);
+    if (ok) {
+      this.msg('Perfect order in ' + this.comps + ' weighings!');
+      askInitials('Sorted!', 'You put all ' + this.n + ' boxes in order using <b>' + this.comps + '</b> weighings.', function(name){
+        if (name) addScore('oe-sort-' + self.n, { name: name, score: self.comps }, function(a,b){ return a.score - b.score; });
+        self.renderLb();
+        self.startRace();
+      });
+    } else {
+      var wrong = 0, correct = this.order.slice().sort(function(a,b){ return self.w[a]-self.w[b]; });
+      this.order.forEach(function(l,i){ if (correct[i] !== l) wrong++; });
+      this.msg('Not quite: ' + wrong + ' boxes are in the wrong place.');
+      this.actions('<button type="button" class="small amber" id="toRace">Watch the algorithms</button>');
+      $('#toRace').onclick = function(){ self.startRace(); };
+    }
+  },
+  bubbleSteps: function(arr){
+    var w = this.w, a = arr.slice(), n = a.length, st = [];
+    for (var p = 0; p < n - 1; p++) {
+      var swapped = false;
+      for (var j = 0; j < n - 1 - p; j++) {
+        st.push({ a: a.slice(), hl: [a[j], a[j+1]], cmp: true });
+        if (w[a[j]] > w[a[j+1]]) { var t = a[j]; a[j] = a[j+1]; a[j+1] = t; swapped = true; }
+      }
+      if (!swapped) break;
+    }
+    st.push({ a: a.slice(), hl: [], done: true });
+    return st;
+  },
+  mergeSteps: function(arr){
+    var w = this.w, a = arr.slice(), st = [];
+    function ms(lo, hi){
+      if (hi <= lo) return;
+      var mid = Math.floor((lo + hi) / 2);
+      ms(lo, mid); ms(mid + 1, hi);
+      var aux = a.slice(lo, hi + 1), i = 0, j = mid - lo + 1, m = mid - lo, h = hi - lo;
+      for (var k = lo; k <= hi; k++) {
+        if (i > m) a[k] = aux[j++];
+        else if (j > h) a[k] = aux[i++];
+        else {
+          st.push({ a: a.slice(), hl: [aux[i], aux[j]], rng: a.slice(lo, hi + 1), cmp: true });
+          if (w[aux[j]] < w[aux[i]]) a[k] = aux[j++]; else a[k] = aux[i++];
+        }
+      }
+    }
+    ms(0, a.length - 1);
+    st.push({ a: a.slice(), hl: [], done: true });
+    return st;
+  },
+  startRace: function(){
+    closeModal();
+    this.phase = 'race';
+    $('#playArea').style.display = 'none'; $('#race').style.display = 'flex'; $('#result').style.display = 'none';
+    this.lanes = [
+      { steps: this.bubbleSteps(this.start), i: -1, count: 0, bars: '#bubBars', labels: '#bubLabels', counter: '#bubCount' },
+      { steps: this.mergeSteps(this.start), i: -1, count: 0, bars: '#merBars', labels: '#merLabels', counter: '#merCount' }
+    ];
+    this.raceSpeed = 650; $('#raceFast').disabled = false;
+    var self = this;
+    this.lanes.forEach(function(l){ self.drawLane(l, { a: self.start, hl: [] }); });
+    this.tick();
+  },
+  drawLane: function(l, s){
+    var w = this.w, max = 30, rng = s.rng || [];
+    $(l.bars).innerHTML = s.a.map(function(k){
+      var cls = 'bar' + (s.hl.indexOf(k) >= 0 ? ' hl' : (rng.indexOf(k) >= 0 ? ' rng' : ''));
+      return '<div class="'+cls+'" style="height:'+(18 + 82 * w[k] / max)+'%">'+w[k]+'</div>';
+    }).join('');
+    $(l.labels).innerHTML = s.a.map(function(k){ return '<span>'+k+'</span>'; }).join('');
+    $(l.counter).textContent = l.count + ' weighings';
+  },
+  tick: function(){
+    var self = this, allDone = true;
+    this.lanes.forEach(function(l){
+      if (l.i >= l.steps.length - 1) return;
+      allDone = false;
+      l.i++;
+      var s = l.steps[l.i];
+      if (s.cmp) l.count++;
+      self.drawLane(l, s);
+    });
+    if (allDone) { this.showResult(); return; }
+    this.raceTimer = setTimeout(function(){ self.tick(); }, this.raceSpeed);
+  },
+  stopRace: function(){ clearTimeout(this.raceTimer); },
+  skipRace: function(){
+    this.stopRace(); var self = this;
+    this.lanes.forEach(function(l){
+      while (l.i < l.steps.length - 1) { l.i++; if (l.steps[l.i].cmp) l.count++; }
+      self.drawLane(l, l.steps[l.i]);
+    });
+    this.showResult();
+  },
+  showResult: function(){
+    var n = this.n, best = n === 8 ? 16 : 10, b = this.lanes[0].count, m = this.lanes[1].count;
+    var you = this.isSorted(this.order) ? this.comps + ' weighings' : 'not sorted';
+    var r = $('#result');
+    r.innerHTML = '<h3>The results</h3><table>' +
+      '<tr class="you"><td>You</td><td>' + you + '</td></tr>' +
+      '<tr><td>Bubble sort</td><td>' + b + ' weighings</td></tr>' +
+      '<tr><td>Merge sort</td><td>' + m + ' weighings</td></tr>' +
+      '<tr><td>Fewest any method can guarantee for ' + n + ' boxes</td><td>' + best + ' weighings</td></tr></table>' +
+      '<p>Bubble sort is <b class="mono">O(n&sup2;)</b>: double the boxes and it needs about four times the work. Merge sort is <b class="mono">O(n log n)</b>. With a million items bubble sort needs about 500 billion comparisons; merge sort needs about 20 million.</p>' +
+      '<div class="actions" style="margin-top:12px"><button type="button" class="amber" id="againBtn">Play again</button></div>';
+    r.style.display = 'block';
+    $('#raceFast').disabled = true;
+    var self = this; $('#againBtn').onclick = function(){ self.newGame(); };
+  },
+  renderLb: function(){
+    $('#sortLbTitle').textContent = 'Top sorters: ' + this.n + ' boxes';
+    renderLb($('#sortLb'), load('oe-sort-' + this.n), function(e){ return e.score; }, 'No scores yet. Be the first!');
+  }
+};
+GAMES.sort = Sort;
+$('#boxes').addEventListener('click', function(e){ var b = e.target.closest('[data-box]'); if (b) Sort.tap(b.dataset.box); });
+$('#sortNew').onclick = function(){ Sort.newGame(); };
+$('#sortCheck').onclick = function(){ Sort.check(); };
+$('#modeWeigh').onclick = function(){ Sort.setMode('weigh'); };
+$('#modeSwap').onclick = function(){ Sort.setMode('swap'); };
+$('#raceFast').onclick = function(){ Sort.raceSpeed = 180; $('#raceFast').disabled = true; };
+$('#raceSkip').onclick = function(){ Sort.skipRace(); };
+$$('#nSeg button').forEach(function(b){ b.onclick = function(){ Sort.setN(+b.dataset.n); }; });
+$('#sortLbReset').onclick = function(){ if (confirm('Clear the ' + Sort.n + '-box leaderboard?')) { save('oe-sort-' + Sort.n, []); Sort.renderLb(); } };
+
+/* ---------- start up ---------- */
+syncLevelSegs();
+Sort.n = LEVEL === 'y10' ? 6 : 8;
+$$('#nSeg button').forEach(function(x){ x.classList.toggle('on', +x.dataset.n === Sort.n); });
+Sort.drawScale();
+Gates.loadLevel(0);
+Blitz.renderStatic(); Blitz.render();
+})();
+</script>
+</body>
+</html>
